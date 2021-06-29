@@ -1,0 +1,4 @@
+name = "Pakistan tracking"
+description = "It can be used fot Pakistan tracking functionalits"
+core = "7.x"
+package = "Custom"

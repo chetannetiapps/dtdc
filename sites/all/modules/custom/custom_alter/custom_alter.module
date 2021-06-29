@@ -1,0 +1,386 @@
+<?php
+function custom_alter_init() {
+	if(drupal_is_front_page()) {
+		global $base_url;
+		//$site_name = "http://dtdcxnsptjnpyd.devcloud.acquia-sites.com/";
+		$site_name = "http://dtdc.com/";
+		$ref = $_SERVER["HTTP_REFERER"]; //get referrer from _SERVER array 
+		$ip = get_client_ip(); // Getting client IP
+		$result = drupal_http_request("http://api.ipinfodb.com/v3/ip-country/?key=7894081fce05c42f30c9689c958f26f9f1ccbeca2f7db4ebe666d85c5f63d372&ip=".$ip."");
+		$host_array = explode(';', $result->data);
+		$param = $_REQUEST['redir'];
+		if($base_url == 'http://dtdc.com' && !stristr($ref, "$site_name")) {
+			if(!isset($param) && $host_array[3] == 'IN') { //India
+				//header('Location: http://dtdc.in');
+				drupal_goto('http://dtdc.in');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'US') { //USA
+				drupal_goto('http://usa.dtdc.com');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'CA') { //Canada
+				drupal_goto('http://canada.dtdc.com');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'GB') { //UK
+				drupal_goto('http://uk.dtdc.com');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'CN') { //China
+				drupal_goto('http://china.dtdc.com');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'BD') { //Bangladesh
+				drupal_goto('http://bangladesh.dtdc.com');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'SG') { //Singapore
+				drupal_goto('http://singapore.dtdc.com');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'NP') { //Nepal
+				drupal_goto('http://nepal.dtdc.com');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'PK') { //Pakistan
+				drupal_goto('http://pakistan.dtdc.com');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'AE') { //UAE
+				drupal_goto('http://uae.dtdc.com');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'HK') { //Hongkong
+				drupal_goto('http://hongkong.dtdc.com');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'LK') { //Srilanka
+				drupal_goto('http://srilanka.dtdc.com');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'KE') { //Kenya
+				drupal_goto('http://kenya.dtdc.com');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'MY') { //Malaysia
+				drupal_goto('http://malaysia.dtdc.com');
+				exit();
+			}
+			if(!isset($param) && $host_array[3] == 'AU') { //Australia
+				drupal_goto('http://dtdcaustralia.com.au');
+				exit();
+			}
+		}
+	}
+}
+
+// Function to get the client IP address
+function get_client_ip() {
+    $ipaddress = '';
+    if (getenv('HTTP_CLIENT_IP'))
+        $ipaddress = getenv('HTTP_CLIENT_IP');
+    else if(getenv('HTTP_X_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+    else if(getenv('HTTP_X_FORWARDED'))
+        $ipaddress = getenv('HTTP_X_FORWARDED');
+    else if(getenv('HTTP_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_FORWARDED_FOR');
+    else if(getenv('HTTP_FORWARDED'))
+       $ipaddress = getenv('HTTP_FORWARDED');
+    else if(getenv('REMOTE_ADDR'))
+        $ipaddress = getenv('REMOTE_ADDR');
+    else
+        $ipaddress = 'UNKNOWN';
+    return $ipaddress;
+}
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function custom_alter_ctools_plugin_directory($owner, $plugin_type){
+  if ($owner == 'feeds_tamper' && $plugin_type == 'plugins') {
+    return 'plugins';
+  }
+}
+/**
+ * implements hook_block_info()
+ **/
+ function custom_alter_block_info() {
+	$blocks = array();
+
+	$blocks['menu_block'] = array(
+		'info' => t('Menu Block'),
+	);
+	$blocks['tracking_locate_block'] = array(
+		'info' => t('Tracking Locate Block'),
+	);
+	return $blocks;
+}
+
+function custom_alter_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+     case 'menu_block':
+     $block['subject'] = '';
+     $block['content'] = array(
+     '#markup' => custom_menu(),
+     );
+     break;
+     case 'tracking_locate_block':
+      $block['subject'] = '';
+      $block['content'] = drupal_get_form('tracking_locate_form');
+    break;
+  }
+
+  return $block;
+}
+function custom_menu(){
+	global $user;
+	$login = ($user->uid) ?  "<li class='logout'><a href='user/logout'><i class='fa fa-user'>&nbsp;Logout</i></a></li>" : "<li class='login'><a href='#'><i class='fa fa-user'>&nbsp;Login</i></a></li>";
+
+
+	$output = array();
+	$output = "<div id='navbar' class='navbar-collapse collapse'>";
+	$output .= "<ul class='nav navbar-nav'>";
+	$output .="<li class='active home'><a href='node'><i class='fa fa-home'></i></a></li>";
+	$output .= "<li><a href='node/36'>About</li><li><a href='#'>Products</li><li><a href='#'>E-Booking</li>";
+	$output .= "<li><a href='#'>Schedule Pickup</li><li><a href='#'>Investor Relations</li><li><a href='#'>Corporate Compliance</li>";
+	$output .= "<li><a href='#'>Accolades</li><li><a href='#'>Careers</li><li><a class='holiday' href='#'>Holidays</li>";
+	$output .= $login;//"<li class='login'><a href='user'><i class='fa fa-user'>&nbsp;Login</i></a></li>";
+	$output .= "</ul>";
+
+	return $output;
+}
+function tracking_locate_form($form, &$form_state){
+
+	$form = array();
+	$active = array(0 => t('Shipment Number'), 1 => t('Reference Number'));
+
+	$form['track']['consigments'] = array(
+	/*'#prefix' => "<div class='tracking-form'>
+	     <ul><li class='tracking-btn active'><a href='#'>Tracking</a></li><li class='office-btn'><a href='#'>Locate Office</a></li></ul></div>
+	     <div class=tracking-inner-form>",
+	 */
+	     '#prefix' => "<div class='tracking-form'>
+	     <ul><li class='tracking-btn active'><h3>Track Your Shipment</h3></li></ul></div>
+
+	     <div class=tracking-inner-form>",
+		 '#type' => 'radios',
+		 '#title' => t(''),
+		 '#default_value' => 0,
+		 '#options' => $active,
+		 '#description' => t(''),
+	  );
+     $form['track']['trackid'] = array(
+		  '#type' => 'textarea',
+		  '#title' => t(''),
+		  '#default_value' =>'',
+		  '#required' => TRUE,
+		  '#attributes' => array('placeholder' => 'Upto 25 AWB, separated by comma'),
+		  '#resizable' => false,
+		  '#prefix' => '<div class="new-search">',
+		  '#suffix' => '</div>',
+     );
+     /*$info = "<div class=trac-more>".l(t('Help Me Track More'),'Help-Me-Track')."".l(t('Tracking Option'),'Tracking-Option')."</div>";
+	 $form['track']['extra'] = array(
+      '#prefix' => '<div class="button-wrapper">',
+      '#type' => 'item',
+      '#markup' => $info,
+    );*/
+	$form['track']['submit'] = array(
+		'#type' => 'image_button',
+		'#src' => 'sites/all/themes/dtdc/images/icon_search-new.png',//base_path() . path_to_theme() . '/images/icon_search-new.png',
+		'#value' => 'Track',
+		'#submit' => array('tracking_locate_submit'),
+		//'#attributes' => array('class' => array('form-textarea-wrapper')),
+		'#prefix' => '<div class="new-search">',
+		'#suffix' => '</div>',
+		//'#suffix' => '</div></div>',
+	);
+
+/*
+	$form['office']['keyword'] = array(
+		 '#prefix' => "<div class=main-office-wrapper>
+		 <div class=sub-wrapper><ul><li class='domestic-btn active'>Domestic</li>
+		 <li class=international-btn>International</li></ul></div><div class=whole-domestic-wrapper>
+		 <div class=domestic-inner><div class=domestic>Search By</div>",
+		 '#type' => 'textarea',
+		 '#title' => t('Keyword'),
+		 '#default_value' =>'',
+		 '#resizable' => false,
+	);
+	$form['office']['submit'] = array(
+		'#type' => 'submit',
+		'#value' => 'Track',
+		'#submit' => array('tracking_locate_submit'),
+		'#suffix' => '</div>',
+	);
+	$form['office']['city'] = array(
+		 '#prefix' => '<div class=inner-wrapper><div class=location>Search By Location</div>',
+		 '#type' => 'textfield',
+		 '#title' => t('city'),
+		 '#default_value' =>'',
+	);
+	$form['office']['zipcode'] = array(
+		 '#type' => 'textfield',
+		 '#title' => t('Zip Code'),
+		 '#default_value' =>'',
+	);
+	$form['office']['area'] = array(
+		 '#type' => 'textfield',
+		 '#title' => t('Area'),
+		 '#default_value' =>'',
+	);
+	$form['office']['domestic_submit'] = array(
+		'#type' => 'submit',
+		'#value' => 'Track',
+		'#submit' => array('tracking_locate_submit'),
+		'#suffix' => '</div></div>',
+	);
+	$form['office']['international_country'] = array(
+		 '#prefix' => '<div class=international-main-wrapper><div class=international-wrapper>Search By Location</div>',
+		 '#type' => 'select',
+		 '#options' => array(
+					0 => t('Country 1'),
+					1 => t('Country 2'),
+					),
+		 '#title' => t('Country'),
+		 '#default_value' =>'Selected',
+	);
+	$form['office']['international_city'] = array(
+		 '#type' => 'textfield',
+		 '#title' => t('city'),
+		 '#default_value' =>'',
+	);
+
+	$form['office']['internatinal-submit'] = array(
+		'#type' => 'submit',
+		'#value' => 'Track',
+		'#submit' => array('tracking_locate_submit'),
+		'#suffix' => '</div></div>',
+	);
+	*/
+
+	return $form;
+}
+function tracking_locate_submit(&$form, $form_state){
+	$trackingType = $form_state['values']['consigments'];
+	$tracking_no = $form_state['values']['trackid'];
+
+	 if(strlen($form_state['values']['consigments']) == 0){
+		 drupal_set_error("Please enter Shipment Number.");
+
+	 }
+	// $trackResult = trackingCURLRequest($tracking_no);
+	$form_state['redirect'] = 'tracking/'.$tracking_no;
+	// echo "trackResult <pre/>";print_r($trackResult);exit;
+	//return theme('custom_alter',array('event'=>$trackResult['Event']));
+	drupal_goto('tracking/'.$tracking_no);
+	// return true;
+}
+
+
+
+
+
+
+/**
+ * Implements hook_node_view().
+ */
+// function custom_alter_node_view($node, $view_mode, $langcode) {
+// 	if(arg(0) == 'node' && arg(1) == is_numeric(arg(1)) && arg(1) != 36){
+// 		 $node->content['title']= array('#markup'=>"<div class=title>" .$node->title. "</div>");
+// 	}
+
+//   return $node;
+// }
+/**
+ * Implements hook_form_alter().
+ */
+function custom_alter_form_alter(&$form, &$form_state, $form_id) {
+ // dpm($form_id);
+
+ if($form_id=='views_exposed_form'){
+ 	$franchise_country = db_select('field_data_field_franchise_country', 'c')
+        ->fields('c')
+        ->groupBy('c.field_franchise_country_value')
+        ->orderBy('c.field_franchise_country_value', 'ASC')
+        ->execute();
+    $dropdown_array = array('' => t('-- Any --'));
+      foreach ($franchise_country as $country) {
+        $dropdown_array[$country->field_franchise_country_value] = $country->field_franchise_country_value;
+      }
+ 	// dpm($franchise_country);
+ 	//$form['field_franchise_country_value']['#type'] = 'select';
+ 	$form['field_franchise_country_value'] = array(
+         '#type' => 'select',
+         '#options' => $dropdown_array,
+      );
+
+ }
+
+  if($form_id == 'dtdc_country_branch_node_form'){
+
+
+  $form['actions']['submit']['#submit'][] = 'dtdc_country_latitude';
+
+ // print"<pre>".print_r($form_state,1)."</pre>";
+  }
+  if($form_id == 'views_exposed_form_dtdc_country_view_page_1'){
+    print"<pre>".print_r($form,1)."</pre>";
+  }
+ }
+ function dtdc_get_lat_long($country_code, $province_code) {
+
+	$country_name = location_country_name($country_code);
+	$encoded_country = urlencode($country_name);
+	$province_name = location_province_name($country_code, $province_code);
+	$address = urlencode($country_name).'+'.urlencode($province_name);
+	$url = "http://maps.google.com/maps/api/geocode/json?address=".$address."&sensor=false&region=".$encoded_country.""; // Restful Google API call
+	$json_data = drupal_http_request($url);
+
+	$data = json_decode($json_data->data, true); // Decode the Json data.
+	//print"<pre>".print_r($json_data,1)."</pre>"; exit;
+	$lat = $data['results'][0]['geometry']['location']['lat'];
+	$long = $data['results'][0]['geometry']['location']['lng'];
+
+	return array('lat' => $lat, 'long' => $long);
+}
+ function dtdc_country_latitude(&$form, &$form_state){
+ $country = $form_state['node']->field_dtdc_country[LANGUAGE_NONE][0]['country'];
+ $province = $form_state['node']->field_dtdc_country[LANGUAGE_NONE][0]['province'];
+
+ if(isset($country) && isset($province)){
+ 	$lid= $form_state['node']->field_dtdc_country[LANGUAGE_NONE][0]['lid'];
+ 	$name = $form_state['node']->field_dtdc_country[LANGUAGE_NONE][0]['name'];
+ 	$street = $form_state['node']->field_dtdc_country[LANGUAGE_NONE][0]['street'];
+ 	$city = $form_state['node']->field_dtdc_country[LANGUAGE_NONE][0]['city'];
+
+	 $lat_log = dtdc_get_lat_long($country, $province);
+//print"<pre>".print_r($lat_log,1)."</pre>"; exit;
+	$form_state['node']->field_dtdc_country[LANGUAGE_NONE][0]['latitude'] = $lat_log['lat'];
+	$form_state['node']->field_dtdc_country[LANGUAGE_NONE][0]['longitude'] = $lat_log['long'];
+
+	update_current_location($lid, $name, $street, $city, $province, $country, $lat_log);
+	}
+
+	 }
+
+ function update_current_location($lid, $name, $street, $city, $province, $country, $lat_log) {
+ 	//print"<pre>".print_r($lid, $name, $street, $city, $province, $country, $lat_log,1)."</pre>"; exit();
+	$result = db_update('location')
+				->fields(array(
+					'name' => $name,
+					'street' => $street,
+					'city' => $city,
+					'province' => $province,
+					'country' => $country,
+					'latitude' => $lat_log['lat'],
+					'longitude' => $lat_log['long'],
+					))
+				->condition('lid', $lid)
+				->execute();
+}
+?>
+

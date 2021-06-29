@@ -1,0 +1,30 @@
+<?php
+
+function std_hacks_block_info() {
+	$blocks = array();
+	$blocks['custom_menu'] = array(
+		'info' => t('Custom menu block'),
+	);
+	return $blocks;
+}
+
+function std_hacks_block_view($delta = '') {
+	$block = array();
+	switch($delta) {
+		case 'custom_menu':
+			$block['subject'] = '';
+			$block['content'] = theme('menu_style', array('title' => 'foo', 'content' => 'bar'));
+		break;
+	}
+	return $block;
+}
+
+function std_hacks_theme(){
+	return array(
+		'menu_style' => array(
+			'template' => 'custom-block-menu',
+			'path' => drupal_get_path('module', 'std_hacks'),
+			'variables' => array('title' => NULL, 'content' => NULL),
+		),
+	);
+}

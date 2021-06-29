@@ -1,0 +1,745 @@
+<?php
+
+/* Implements hook_init() */
+function ebooking_init()
+{
+    global $base_url;
+    drupal_add_js($base_url.'/sites/all/modules/custom/ebooking/js/ebooking.js');
+}
+
+/**
+ * Implements hook_menu().
+ */
+ function ebooking_block_info() {
+ 	$blocks = array();
+ 	$blocks['request_form_block'] = array(
+ 		'info' => t('Requast Form Block'),
+ 	);
+  $blocks['get_in_tech_form_block'] = array(
+ 		'info' => t('Get In Tech Form Block'),
+ 	);
+  $blocks['know_more_form_block'] = array(
+    'info' => t('Know more About Form Block'),
+  );
+ 	return $blocks;
+ }
+
+ function ebooking_block_view($delta = '') {
+   $block = array();
+
+   switch ($delta) {
+      case 'request_form_block':
+       $block['subject'] = '';
+       $block['content'] = drupal_get_form('send_feedback_form');
+     break;
+     case 'get_in_tech_form_block':
+      $block['subject'] = '';
+      $block['content'] = drupal_get_form('get_in_tech_form');
+    break;
+
+    case 'know_more_form_block':
+     $block['subject'] = '';
+     $block['content'] = drupal_get_form('know_more_about_form');
+   break;
+   }
+
+   return $block;
+ }
+
+
+function ebooking_menu()
+{
+    $items = array();
+
+    $items['ebooking/chose-country'] = array(
+        'title' => t(''),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('ebookings_form'),
+        'access callback' => true,
+
+    );
+
+    $items['locate-us'] = array(
+        'title' => t(''),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('locate_us_form'),
+        'access callback' => true,
+
+    );
+
+    $items['avail-offer'] = array(
+        'title' => t(''),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('avail_offer_form'),
+        'access callback' => true,
+
+    );
+
+    $items['feedback'] = array(
+        'title' => t(''),
+        'page callback' => 'drupal_get_form',
+		    'page arguments' => array('send_feedback_form'),
+        'access callback' => true,
+
+    );
+    $items['get-in-touch'] = array(
+        'title' => t(''),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('get_in_tech_form'),
+        'access callback' => true,
+
+    );
+
+
+    return $items;
+}
+
+function ebookings_form(){
+
+  $form = array();
+
+  $form['ebooking_text'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div class="dt-loc-select col-lg-12"><h1>E-Booking</h1><h2>We will be at your door, when you wish. Use our e-booking service for your convenience.</h2></div>',
+  );
+
+  $form['choose_country'] = array(
+    '#type' => 'select',
+    '#title' => t('Choose a Country'),
+    '#prefix' => '<div class="col-md-12 form-group">',
+    '#suffix' => '</div>',
+    '#options' => array(0 => t('Select'), 1 => t('Australia'),2 => t('Canada'),8 => t('India'),3 => t('Singapore'),4 => t('Sri Lanka'),5 => t('UAE'),6 => t('UK'),7 => t('USA')),
+  );
+$form['ebooking_image'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div class="col-md-12 form-group"><img class="img-responsive" src="/sites/all/themes/dtdc/images/logo.png"/></div>',
+  );
+
+
+   return $form;
+}
+
+
+function locate_us_form(){
+  $form = array();
+
+  $form['locate_us_text'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div class="dt-loc-select col-lg-12"><h1>Locate Us</h1><h2>Please choose a Country to find the contact details.</h2></div>',
+  );
+
+  $form['locate_us_country'] = array(
+    '#type' => 'select',
+    '#title' => t('Choose a Country'),
+    '#prefix' => '<div class="col-md-12 form-group">',
+    '#suffix' => '</div>',
+    '#options' => array(0 => t('Select'),1 => t('India'),2 => t('Australia'),3 => t('Bangladesh'),4 => t('Canada'),5 => t('China'),6 => t('Hongkong'),7 => t('Kenya'),8 => t('Malaysia'),9 => t('Nepal'),11 => t('Singapore'),12 =>t('Sri Lanka'),13 => t('UAE'),14 => t('UK'),15 => t('USA')),
+  );
+
+  $form['locate_us_image'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div class="col-md-12 form-group"><img class="img-responsive" src="/sites/all/themes/dtdc/images/logo.png"/></div>',
+  );
+
+  return $form;
+
+}
+
+
+function avail_offer_form(){
+  $form = array();
+
+  $form['avail_offer_text'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div class="avail-offer-msg"><h1>Avail Offer</h1><p>Please choose a Country to find the offer details.</p></div>',
+  );
+
+  $form['avail_offer_country'] = array(
+    '#type' => 'select',
+    '#title' => t('Choose a Country'),
+    '#options' => array(0 => t('Select'),1 => t('USA'),2 => t('UK'),3 => t('Singapore'),4 => t('UAE'),5 => t('Canada')),
+  );
+
+  $form['avail_offer_image'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div class="ebooking-img-wrapper"><img src="/sites/all/themes/dtdc/images/logo.png"/></div>',
+  );
+
+  return $form;
+
+}
+
+function know_more_about_form(){
+     //$url = drupal_get_path_alias($_GET['q']);
+    //echo $url;
+    $form = array();
+  $form['know_more_email'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+    'placeholder' => t('Email id'),
+    ),
+    '#prefix' => '<div class="input-group">',
+    '#suffix' => '</div>',
+  );
+  $form['know_more_email_title'] = array(
+    "#type" => "hidden",
+    "#default_value" => 'Cross Border Management',
+    '#prefix' => '<div class="service-title-email">',
+    '#suffix' => '</div>',
+  );
+  $form['submit_button'] = array(
+    '#type' => 'submit',
+    '#submit' => array('custom_know_mr_form_submit'),
+    '#value' => t('Submit'),
+    '#prefix' => '<div class="input-group-btn">',
+    '#suffix' => '</div>'
+  );
+    return $form;
+}
+
+function custom_know_mr_form_submit($form, &$form_state){
+  drupal_set_message("Thank you for submitting your email id. We will share the details shortly.");
+     $sub = 'Know More About: ' . $form_state['values']['know_more_email_title'];
+    $email_content = get_mail_content_email($form_state);
+    $body_content= htmlspecialchars($email_content);
+    $params = array(
+    'headers' => array('Content-Type' => 'text/html'),
+    'body' => $body_content,
+    'subject' => $sub,
+
+    );
+    $key = 'know_more_ab_email';
+    $from = $form_state['values']['know_more_email'];
+    $to = "gmo@dtdc.com";
+
+
+    $mail = drupal_mail('ebooking', $key, $to, language_default(), $params, $from);
+}
+
+function get_in_tech_form(){
+  $form = array();
+  $form["wrapper"] = array("#markup" => "<div class='inline-messages'></div>");
+  $form['gettech_name'] = array(
+    '#type' => 'textfield',
+     '#required' => TRUE,
+    '#attributes' => array(
+    'placeholder' => t('Name'),
+    ),
+    '#prefix' => '<div class="col-md-2 col-sm-2 col-xs-12 form-group">',
+    '#suffix' => '</div>',
+	);
+  $form['gettech_company'] = array(
+     '#type' => 'textfield',
+     '#attributes' => array(
+     'placeholder' => t('Company'),
+     ),
+     '#prefix' => '<div class="col-md-2 col-sm-2 col-xs-12 form-group">',
+     '#suffix' => '</div>',
+ 	);
+	$form['gettech_email'] = array(
+    '#type' => 'textfield',
+     '#required' => TRUE,
+    '#attributes' => array(
+    'placeholder' => t('Email'),
+    ),
+    '#prefix' => '<div class="col-md-2 col-sm-2 col-xs-12 form-group">',
+    '#suffix' => '</div>',
+	);
+	$form['gettech_phone'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+    'placeholder' => t('Phone No'),
+    ),
+     '#required' => TRUE,
+    '#prefix' => '<div class="col-md-2 col-sm-2 col-xs-12 form-group">',
+    '#suffix' => '</div>'
+	);
+  $form['gettech_country'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+    'placeholder' => t('Country'),
+    ),
+     '#required' => TRUE,
+    '#prefix' => '<div class="col-md-2 col-sm-2 col-xs-12 form-group">',
+    '#suffix' => '</div>'
+  );
+  $form['gettech_heading'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div class="clear"></div><span>Interested in (you can choose more than one)</span>',
+  );
+  $form['gettech_crossborder'] = array(
+    '#type' => 'checkboxes',
+    '#options' => array('Cross Border Management' => "<b>Cross Border Management</b>", 'Pickups' => "Pickups", 'Localized WH/Processing' => "Localized WH/Processing", 'Custom Clearance' => 'Custom Clearance', 'Line Haul Management' => 'Line Haul Management', 'B2B2C/B2C Delivery Management' => 'B2B2C/B2C Delivery Management', 'Reverse Logistics' => 'Reverse Logistics'),
+    '#attributes' => array('class' => array('cross')),
+    '#prefix' => '<div class="col-md-4">',
+    '#suffix' => '</div>'
+    );
+  $form['gettech_intetech'] = array(
+    '#type' => 'checkboxes',
+    '#options' => array('Integrated Technology Platform' => "<b>Integrated Technology Platform</b>", 'Cataloging' => "Cataloging", 'Product Listing' => 'Product Listing', 'Channel Management' => 'Channel Management', 'Payment Solution Integration' => 'Payment Solution Integration', 'Real Time Visibility' => 'Real Time Visibility'),
+    '#attributes' => array('class' => array('checkinteg')),
+    '#prefix' => '<div class="col-md-4">',
+    '#suffix' => '</div>'
+  );
+  $form['gettech_warehousing'] = array(
+    '#type' => 'checkboxes',
+    '#options' => array("Warehousing and E-Fulfilment" => "<b>Warehousing and E-Fulfilment</b>", "Inventory Management" => "Inventory Management", "Custom Packaging" => "Custom Packaging", "Multi-Service Provider" => 'Multi-Service Provider', "Multi-Channel Order Management" => 'Multi-Channel Order Management', "Secured & Temperature Controlled" => 'Secured & Temperature Controlled'),
+    '#attributes' => array('class' => array('checkwarehouse')),
+    '#prefix' => '<div class="col-md-4">',
+    '#suffix' => '</div>'
+  );
+  $form['gettech_second'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div class="clear"></div>',
+  );
+  $form['gettech_multi_vendor'] = array(
+    '#type' => 'checkboxes',
+    '#options' => array("Multi-Vendor Management" => "<b>Multi-Vendor Management</b>", "Network Partnerships" => "Network Partnerships", "Omni-Channel Management" => "Omni-Channel Management", "Vendor Pickups & Drop Offs" => "Vendor Pickups & Drop Offs", "Vendor Mapping" => "Vendor Mapping"),
+    '#default_value' => array(1, 5),
+    '#attributes' => array('class' => array('checkvendor')),
+     '#default_value' => 0,
+    '#prefix' => '<div class="col-md-4">',
+    '#suffix' => '</div>'
+  );
+  $form['gettech_last_Mile'] = array(
+    '#type' => 'checkboxes',
+    '#options' => array("Last Mile Delivery" => "<b>Last Mile Delivery</b>", "Cash On Delivery" => "Cash On Delivery", "Next Day Delivery" => "Next Day Delivery", "Managed Drop Ship" => 'Managed Drop Ship', "Reverse Logistics" => 'Reverse Logistics'),
+    '#attributes' => array('class' => array('checklastmile')),
+    '#prefix' => '<div class="col-md-4">',
+    '#suffix' => '</div>'
+  );
+  $form['captcha'] = array(
+  '#type' => 'captcha',
+  '#captcha_type' => 'recaptcha/reCAPTCHA',
+  '#prefix' => '<div class="col-md-4"><script src="https://www.google.com/recaptcha/api.js"></script>',
+  '#suffix' => '</div>'
+  );
+  $form['gettech_third'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div class="clear"></div>'
+  );
+  $form['gettech_message'] = array(
+    '#type' => 'textarea',
+    '#title'  => t('Comments'),
+    '#prefix' => '<div class="quote_coment col-md-12">',
+    '#suffix' => '</div>'
+	);
+	$form['submit_button'] = array(
+    '#type' => 'submit',
+    //  '#submit' => array('custom_gettech_form_submit'),
+    "#ajax" => array(
+   "callback" => "get_in_tech_form_callback",
+   "wrapper" => "get-in-tech-form",
+       "effect" => "fade"
+ ),
+    '#value' => t('Request a quote'),
+    '#attributes' => array('class' => array('dt_btn6')),
+    '#prefix' => '<p class="submit_btn4">',
+    '#suffix' => '</p>'
+	);
+
+  return $form;
+}
+
+function get_in_tech_form_callback($form, &$fstate) {
+  $messages = theme('status_messages');
+
+  if($messages){
+    $form["wrapper"] = array("#markup" => "<div class='inline-messages capthca-msg'>$messages</div>");
+  }
+  return $form;
+}
+function get_in_tech_form_validate($form, &$form_state) {
+  if ($form_state['values']['gettech_name'] == '') {
+   form_set_error('', t('Please Enter Your Name'));
+  }
+  if ($form_state['values']['gettech_email'] == '') {
+   form_set_error('', t('Please Enter Valid Email'));
+  }
+  if ($form_state['values']['gettech_phone'] == '') {
+   form_set_error('', t('Please Enter Your Phone Number'));
+  }
+  if ($form_state['values']['gettech_country'] == '') {
+   form_set_error('', t('Please Enter Your Country Name'));
+  }
+}
+
+function get_in_tech_form_submit($form, &$form_state) {
+  drupal_set_message("Thank you for sharing the details. Our team will get in touch with you soon");
+   $crossborder_options_chosen = array_filter($form_state['values']['gettech_crossborder']);
+   $intetech_options_chosen = array_filter($form_state['values']['gettech_intetech']);
+   $warehousing_options_chosen = array_filter($form_state['values']['gettech_warehousing']);
+   $multi_vendor_options_chosen = array_filter($form_state['values']['gettech_multi_vendor']);
+   $last_Mile_options_chosen = array_filter($form_state['values']['gettech_last_Mile']);
+  // print_r($heating_options_chosen);
+    //$email_content = get_mail_content_cro($value);
+    $email_content = get_mail_content_get($form_state, $crossborder_options_chosen, $intetech_options_chosen, $warehousing_options_chosen, $multi_vendor_options_chosen, $last_Mile_options_chosen);
+    $body_content= htmlspecialchars($email_content);
+	  $params = array(
+	  'headers' => array('Content-Type' => 'text/html'),
+	  'body' => $body_content
+
+	  );
+
+	  $key = 'get_in_tech_email';
+		$from = $form_state['values']['gettech_email'];
+		$to = "gmo@dtdc.com";
+
+
+	  $mail = drupal_mail('ebooking', $key, $to, language_default(), $params, $from);
+}
+
+function send_feedback_form(){
+  $form = array();
+	$form['feedback_name'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+    'placeholder' => t('Name'),
+    ),
+    '#prefix' => '<div class="col-md-6 col-xs-12 form-group">',
+    '#suffix' => '</div>'
+	);
+	$form['feedback_email'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+    'placeholder' => t('Email'),
+    ),
+    '#prefix' => '<div class="col-md-6 col-xs-12 form-group">',
+    '#suffix' => '</div>'
+	);
+	$form['feedback_phone'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+    'placeholder' => t('Phone No'),
+    ),
+    '#prefix' => '<div class="col-md-6 col-xs-12 form-group">',
+    '#suffix' => '</div>'
+	);
+  $form['feedback_company'] = array(
+     '#type' => 'textfield',
+     '#attributes' => array(
+     'placeholder' => t('Company Name'),
+     ),
+     '#prefix' => '<div class="col-md-6 col-xs-12 form-group">',
+     '#suffix' => '</div>'
+ 	);
+
+  $form['feedback_heading'] = array(
+  '#type' => 'markup',
+  '#markup' => '<h5>What are you planning to discuss?</h5>',
+  );
+
+	$form['feedback_message'] = array(
+    '#type' => 'textarea',
+    '#required' => TRUE,
+    '#attributes' => array(
+    'placeholder' => t('Comments'),
+    ),
+    '#prefix' => '<div class="col-md-12 col-xs-12 form-group">',
+    '#suffix' => '</div>'
+	);
+  $form['captcha'] = array(
+  '#type' => 'captcha',
+  '#captcha_type' => 'recaptcha/reCAPTCHA',
+  '#prefix' => '<div class="rcap-msg"><div class="recaptcha">',
+  '#suffix' => '</div></div>'
+);
+	$form['submit_button'] = array(
+    '#type' => 'submit',
+    '#submit' => array('custom_feedback_form_submit'),
+    '#value' => t('Send Request'),
+    '#attributes' => array('class' => array('req-btn')),
+    '#prefix' => '<p class="text-center send-feedback-form__submit">',
+    '#suffix' => '</p>'
+	);
+
+  return $form;
+}
+
+
+function send_feedback_form_validate($form, &$form_state){
+	$valid_email = $form_state['values']['feedback_email'];
+	if(!valid_email_address($valid_email)) {
+		form_set_error('feedback_email', 'Sorry. Your email address,' . $valid_email . ' is not valid. Please submit a valid E-mail address.');
+	}
+}
+
+
+function custom_feedback_form_submit($form, &$form_state){
+
+	drupal_set_message("Thanks for the feedback");
+    // $email_content = $form_state['values']['feedback_email'];
+	  $email_content = get_mail_content($form_state);
+    $body_content= htmlspecialchars($email_content);
+	  $params = array(
+	  'headers' => array('MIME-Version' => '1.0','Content-Type' => 'text/html; charset=UTF-8; format=flowed', 'Content-Transfer-Encoding' => '8Bit', 'X-Mailer' => 'Drupal'),
+	  'body' => $body_content
+
+	  );
+	  $key = 'feedback_email';
+		$from = $form_state['values']['feedback_email'];
+		$to = "gmo@dtdc.com";
+
+
+	  $mail = drupal_mail('ebooking', $key, $to, language_default(), $params, $from);
+}
+
+function ebooking_mail($key, &$message, $params){
+	$language = $message['language'];
+   switch ($key) {
+    case 'feedback_email':
+    	  $headers = array('MIME-Version' => '1.0','Content-Type' => 'text/html;charset=UTF-8; format=flowed','Content-Transfer-Encoding' => '8Bit','X-Mailer' => 'Drupal');
+    	  foreach ($headers as $key => $value) {
+    		$message['headers'][$key] = $value;
+    	  }
+    	  $message['subject'] = t('Feedback');
+    	  $message['body'][] = $params['body'];
+    break;
+    case 'get_in_tech_email':
+          $headers = array(
+         'MIME-Version' => '1.0',
+         'Content-Type' => 'text/html; charset=UTF-8; format=flowed',
+         'Content-Transfer-Encoding' => '8Bit',
+         'X-Mailer' => 'Drupal'
+        );
+    	  foreach ($headers as $key => $value) {
+    		$message['headers'][$key] = $value;
+    	  }
+    	  $message['subject'] = t('GET IN TOUCH');
+    	  $message['body'][] = $params['body'];
+    break;
+    case 'know_more_ab_email':
+        $headers = array('MIME-Version' => '1.0','Content-Type' => 'text/html;charset=UTF-8; format=flowed','Content-Transfer-Encoding' => '8Bit','X-Mailer' => 'Drupal');
+        foreach ($headers as $key => $value) {
+        $message['headers'][$key] = $value;
+        }
+
+        $message['subject'] =  $params['subject'];
+        $message['body'][] = $params['body'];
+    break;
+    }
+}
+
+function get_mail_content_get($form_state, $crossborder_options_chosen, $intetech_options_chosen, $warehousing_options_chosen, $multi_vendor_options_chosen, $last_Mile_options_chosen){
+
+  $body .= '<table border="1" style="width:100%; border-spacing:0px; border:1px solid #2d2d2d;" >';
+  $body .= '<tr>';
+  $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Name</td>';
+  $body .= '<td style="text-align:center; border: 1px solid #2d2d2d;"  colspan="5">'.$form_state['values']['gettech_name'].'</td>';
+    $body .= '</tr>';
+    $body .= '<tr>';
+      $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Company</td>';
+      $body .= '<td style="text-align:center; border: 1px solid #2d2d2d;"  colspan="5">'.$form_state['values']['gettech_company'].'</td>';
+    $body .= '</tr>';
+    $body .= '<tr>';
+      $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Email id</td>';
+      $body .= '<td style="text-align:center; border: 1px solid #2d2d2d;"  colspan="5"><a href="#" mailto=" '.$form_state['values']['gettech_email'].'"> '.$form_state['values']['gettech_email'].'</a></td>';
+    $body .= '</tr>';
+    $body .= '<tr>';
+      $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Phone Number</td>';
+      $body .= '<td style="text-align:center; border: 1px solid #2d2d2d;" colspan="5">'.$form_state['values']['gettech_phone'].'</td>';
+    $body .= '</tr>';
+    $body .= '<tr>';
+      $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Country</td>';
+      $body .= '<td style="text-align:center; border: 1px solid #2d2d2d;" colspan="5">'.$form_state['values']['gettech_country'].'</td>';
+    $body .= '</tr>';
+    $body .= '<tr>';
+      $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Service Main Category</td>';
+      $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Cross Border Management</td>';
+      $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Integrated Technology Platform</td>';
+      $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Multi Vendor Management</td>';
+      $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Warehousing & E-Fulfillment</td>';
+      $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Last Mile Delivery</td>';
+    $body .= '</tr>';
+    $body .= '<tr>';
+      $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Sub Category</td>';
+        if($crossborder_options_chosen['Cross Border Management']){
+          $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$crossborder_options_chosen['Cross Border Management'].'</td>';
+        } else {
+            $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+        }
+      if($intetech_options_chosen['Integrated Technology Platform']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$intetech_options_chosen['Integrated Technology Platform'].'</td>';
+      } else {
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }
+      if($warehousing_options_chosen['Warehousing and E-Fulfilment']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$warehousing_options_chosen['Warehousing and E-Fulfilment'].'</td>';
+      } else {
+          $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }
+      if($multi_vendor_options_chosen['Multi-Vendor Management']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$multi_vendor_options_chosen['Multi-Vendor Management'].'</td>';
+      } else {
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }
+      if($last_Mile_options_chosen['Last Mile Delivery']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$last_Mile_options_chosen['Last Mile Delivery'].'</td>';
+      }else {
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }
+
+
+    $body .= '</tr>';
+    $body .= '<tr>';
+      $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;"></td>';
+       if($crossborder_options_chosen['Pickups']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$crossborder_options_chosen['Pickups'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }if($intetech_options_chosen['Cataloging']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$intetech_options_chosen['Cataloging'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }if($warehousing_options_chosen['Inventory Management']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$warehousing_options_chosen['Inventory Management'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }if($multi_vendor_options_chosen['Network Partnerships']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$multi_vendor_options_chosen['Network Partnerships'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }if($last_Mile_options_chosen['Cash On Delivery']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$last_Mile_options_chosen['Cash On Delivery'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }
+    $body .= '</tr>';
+    $body .= '<tr>';
+      $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;"></td>';
+      if($crossborder_options_chosen['Localized WH/Processing']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;; border: 1px solid #2d2d2d;">'.$crossborder_options_chosen['Localized WH/Processing'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;; border: 1px solid #2d2d2d;">NONE</td>';
+      }if($intetech_options_chosen['Product Listing']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;; border: 1px solid #2d2d2d;">'.$intetech_options_chosen['Product Listing'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;; border: 1px solid #2d2d2d;">NONE</td>';
+      }if($warehousing_options_chosen['Custom Packaging']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;; border: 1px solid #2d2d2d;">'.$warehousing_options_chosen['Custom Packaging'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;; border: 1px solid #2d2d2d;">NONE</td>';
+      }if($multi_vendor_options_chosen['Omni-Channel Management']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;; border: 1px solid #2d2d2d;">'.$multi_vendor_options_chosen['Omni-Channel Management'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;; border: 1px solid #2d2d2d;">NONE</td>';
+      }if($last_Mile_options_chosen['Next Day Delivery']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;; border: 1px solid #2d2d2d;">'.$last_Mile_options_chosen['Next Day Delivery'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;; border: 1px solid #2d2d2d;">NONE</td>';
+      }
+    $body .= '</tr>';
+    $body .= '<tr>';
+      $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;"></td>';
+      if($crossborder_options_chosen['Custom Clearance']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$crossborder_options_chosen['Custom Clearance'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }if($intetech_options_chosen['Channel Management']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$intetech_options_chosen['Channel Management'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }if($warehousing_options_chosen['Multi-Service Provider']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$warehousing_options_chosen['Multi-Service Provider'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }if($multi_vendor_options_chosen['Vendor Pickups & Drop Offs']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$multi_vendor_options_chosen['Vendor Pickups & Drop Offs'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }if($last_Mile_options_chosen['Managed Drop Ship']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$last_Mile_options_chosen['Managed Drop Ship'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }
+    $body .= '</tr>';
+    $body .= '<tr>';
+      $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;"></td>';
+         if($crossborder_options_chosen['Line Haul Management']){
+           $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$crossborder_options_chosen['Line Haul Management'].'</td>';
+         }else{
+           $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+         }if($intetech_options_chosen['Payment Solution Integration']){
+          $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$intetech_options_chosen['Payment Solution Integration'].'</td>';
+        }else{
+          $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+        }if($warehousing_options_chosen['Multi-Channel Order Management']){
+          $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$warehousing_options_chosen['Multi-Channel Order Management'].'</td>';
+        }else{
+          $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+        }if( $multi_vendor_options_chosen['Vendor Mapping']){
+          $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$multi_vendor_options_chosen['Vendor Mapping'].'</td>';
+        }else{
+          $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+        }if($last_Mile_options_chosen['Reverse Logistics']){
+          $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$last_Mile_options_chosen['Reverse Logistics'].'</td>';
+        }else{
+          $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+        }
+    $body .= '</tr>';
+    $body .= '<tr>';
+      $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;"></td>';
+      if($crossborder_options_chosen['B2B2C/B2C Delivery Management']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$crossborder_options_chosen['B2B2C/B2C Delivery Management'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }if($intetech_options_chosen['Real Time Visibility']){
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$intetech_options_chosen['Real Time Visibility'].'</td>';
+      }else{
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }if( $warehousing_options_chosen['Secured & Temperature Controlled']){
+      $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$warehousing_options_chosen['Secured & Temperature Controlled'].'</td>';
+      }else{
+      $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+        $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+    $body .= '</tr>';
+    $body .= '<tr>';
+      $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;"></td>';
+      if($crossborder_options_chosen['Reverse Logistics']){
+          $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">'.$crossborder_options_chosen['Reverse Logistics'].'</td>';
+      }else{
+          $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;">NONE</td>';
+      }
+      $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;"></td>';
+      $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;"></td>';
+      $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;"></td>';
+      $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;"></td>';
+      $body .= '<td style="text-align:left; border: 1px solid #2d2d2d;"></td>';
+    $body .= '</tr>';
+    $body .= '<tr>';
+      $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Comments</td>';
+      $body .= '<td style="text-align:center; border: 1px solid #2d2d2d;" colspan="5">'.$form_state['values']['gettech_message'].'</td>';
+    $body .= '</tr>';
+  $body .= '</table>';
+
+
+  return $body;
+}
+function get_mail_content($form_state) {
+  $body = '';
+  $body .= 'Name: '.$form_state['values']['feedback_name'].'<br>';
+  $body .= 'Email Address:'.$form_state['values']['feedback_email'].'<br>';
+  $body .= 'Phone Number:'.$form_state['values']['feedback_phone'].'<br>';
+  $body .= 'Company Name: '.$form_state['values']['feedback_company'].'<br>';
+  $body .= 'Message: '.$form_state['values']['feedback_message'] . '<br>';
+
+  return $body;
+}
+
+function get_mail_content_email($form_state) {
+  //print_r($form_state);
+  //exit;
+  $body .= '<table border="1" style="width:50%;border-spacing:0px; border:1px solid #2d2d2d;" >';
+  $body .= '<tr>';
+  $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Service</td>';
+  $body .= '<td bgcolor="#ddebf7" style="text-align:left; border: 1px solid #2d2d2d;">Email ID</td>';
+  $body .= '</tr>';
+  $body .= '<tr>';
+  $body .= '<td style="border: 1px solid #2d2d2d;">'.$form_state['values']['know_more_email_title'].'</td>';
+  $body .= '<td style="border: 1px solid #2d2d2d;">'.$form_state['values']['know_more_email'].'</td>';
+  $body .= '</tr>';
+  $body .= '</table>';
+  return $body;
+}

@@ -1,0 +1,354 @@
+<?php
+global $base_url;
+ require_once DRUPAL_ROOT . '/includes/locale.inc';
+/**
+* Implements hook_block_info().
+*/
+ function custom_tabs_block_menu() {
+   $items = array();
+
+   $items['custom/ajax'] = array(
+    'access callback' => TRUE,
+    'page callback' => 'custom_ajax_callback',
+  );
+
+  return $items;
+}
+
+function custom_ajax_callback() {
+  header("HTTP/1.1 200 OK");
+  $content = file_get_contents('php://input');
+  $request = json_decode($content);
+    $item = $request->Item;
+    if($item == 'CA' || $item == 'US'){
+     $response = array('weight'=>'LBS',);
+    }
+    else{
+       $response = array('weight'=>'KG',);
+    }
+  echo json_encode($response);
+  exit;
+ }
+
+/**
+* Implements hook_block_info().
+*/
+function custom_tabs_block_block_info() {
+  $blocks = array();
+
+  $blocks['custom_service_tabs_block'] = array(
+    'info' => t('custom service tab block'),
+  );
+  $blocks['custom_careers_tabs_block'] = array(
+    'info' => t('custom careers tab block'),
+  );
+
+  $blocks['custom_prohibited_block'] = array(
+    'info' => t('custom service tab block'),
+  );
+
+   $blocks['ebooking_form_block'] = array(
+    'info' => t('Ebooking form block'),
+  );
+  return $blocks;
+}
+/**
+* Implements hook_block_view().
+*/
+function custom_tabs_block_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'custom_service_tabs_block':
+        $block['subject'] = '';
+        $block['content'] = custom_service_tabs_block_content();
+        break;
+    case 'custom_careers_tabs_block':
+        $block['subject'] = '';
+        $block['content'] = custom_careers_tabs_block_content();
+        break;
+
+    case 'custom_prohibited_block':
+        $block['subject'] = '';
+        $block['content'] = custom_service_prohi_block_content();
+        break;
+
+     case 'ebooking_form_block':
+        $block['subject'] = '';
+         $block['content'] = drupal_get_form('zipCodeForm');
+       // $block['content'] = ebooking_form_block_content();
+        break;
+  }
+
+  return $block;
+}
+
+// Custom ebooking Form Block
+
+function zipCodeForm() {
+// $form['#attributes']['target'] = '_parent';
+$options_list = country_get_list();
+$array1 = $array2 =array();
+$array1 = array(0 => "- select one -");
+$array2 = array($options_list);
+$options = array_merge($array1, $options_list);
+//print_r($options);
+//$array_dedult =$options('SG' => 'Singapore');
+//print_r($options);
+//unset($options['GH']);
+$form_options =array('AU' => 'Australia','CA' => 'Canada','IN' => 'India','SG' => 'Singapore','LK' => 'Sri Lanka', 'AE' =>'United Arab Emirates','GB'=>'United Kingdom','US'=> 'United States');
+
+ //$fromoptions = array_diff_key($options, ['GH' => "GHANA", "KE" => "KENYA",'SO' => "Somalia", "CG" => "Congo (Brazzaville)",'DZ' => "Algeria", "CD" => "Congo (Kinshasa)",'ET' => "Ethiopia", "NA" => "Namibia",'NG' => "Nigeria", "ZA" => "South Africa","SD" => "Sudan","UG" => "Uganda","YE" => "Yemen","ZW" => "Zimbabwe"]);
+//$options = array_diff($options, ["GHANA", "KENYA"]);
+  $form = array();
+  $form['countrySelectBox'] = array(
+    '#type' => 'select',
+    '#title' => 'From',
+    '#prefix' => '<div class="col-md-2 col-xs-8 pd-right countryselectM">',
+    '#suffix' => '</div>',
+    '#default_value' => 'US',
+    '#options' => $form_options,
+  );
+
+ $form['postalCode'] = array(
+     '#type' => 'textfield',
+     '#title' => '&nbsp;',
+       '#attributes' => array(
+    'placeholder' => 'Postcode',
+    ),
+
+     '#prefix' => '<div class="col-md-1 col-xs-4 pd-left postalcodem">',
+     '#suffix' => '</div>',
+  );
+  $form['countrySelectBox1'] = array(
+    '#type' => 'select',
+    '#title' => 'To',
+    '#prefix' => '<div class="col-md-2 col-xs-8 pd-right countryselects">',
+    '#suffix' => '</div>',
+    '#default_value' => '- SELECT ONE -',
+    '#options' => $options,
+  );
+   $form['postalCode1'] = array(
+     '#type' => 'textfield',
+      '#title' => '&nbsp;',
+      '#attributes' => array(
+    'placeholder' => 'Postcode',
+    ),
+     '#prefix' => '<div class="col-md-1 col-xs-4 pd-left postalcodes">',
+     '#suffix' => '</div>',
+  );
+    $form['ebooking_weight'] = array(
+     '#type' => 'textfield',
+     '#title' => 'Weight',
+       '#required' => TRUE,
+     '#prefix' => '<div class="col-md-1 col-xs-8 pd-right ebookingweight">',
+     '#suffix' => '</div>',
+  );
+    $form['ebooking_weightunit'] = array(
+    '#type' => 'select',
+    '#title' => '&nbsp;',
+    '#prefix' => '<div class="col-md-1 col-xs-4 pd-left ebookingweightunit">',
+    '#suffix' => '</div>',
+     '#options' => array('LBS' => t('LBS')),
+  );
+     $form['shipment_type_country'] = array(
+    '#type' => 'select',
+    '#title' => 'Shipment Type',
+    '#prefix' => '<div class="col-md-2 col-xs-8 pd-right shiptyepcountry">',
+    '#suffix' => '</div>',
+    '#options' => array('D' => t('Document'),'N' => t('Non-document')),
+  );
+     $form['submit_button'] = array(
+    '#type' => 'submit',
+    //  '#submit' => array('custom_gettech_form_submit'),
+ //    "#ajax" => array(
+ //   "callback" => "get_in_tech_form_callback",
+ //   "wrapper" => "get-in-tech-form",
+ //       "effect" => "fade"
+ // ),
+    '#value' => 'GET QUOTES',
+    '#attributes' => array('onclick' => 'this.form.target="_blank";return true;'),
+   // '#attributes' => array('class' => array('dt_btn6')),
+    '#prefix' => '<div class="col-md-2 col-xs-12 getguotes">',
+    '#suffix' => '</div>'
+  );
+   return $form;
+
+}
+function zipCodeForm_submit($form, &$form_state) {
+ //echo "<pre>"; print_r($form_state);  echo "</pre>";
+ $from_options_chosen = $form_state['values']['countrySelectBox'];
+   $from_postal_chosen = $form_state['values']['postalCode'];
+   $to_options_chosen = $form_state['values']['countrySelectBox1'];
+   $to_postal_chosen = $form_state['values']['postalCode1'];
+   $weight_chosen = $form_state['values']['ebooking_weight'];
+   if($from_options_chosen == 'CA' || $from_options_chosen == 'US') {
+   $weight_options_chosen = 'LBS';
+   }
+   else {
+  $weight_options_chosen = $form_state['values']['ebooking_weightunit'];
+   }
+   $shipment_options_chosen = $form_state['values']['shipment_type_country'];
+if($from_options_chosen == 'SG') {
+  $token_value= 'F9-26-7D-87-AF-AF-69-EC-E9-4C-F5-57-75-AC-9B-B7';
+  $url ='https://ebookingsg.dtdc.com/quickquote.aspx?fromcountry='.$from_options_chosen.'&frompostcode='.$from_postal_chosen.'&destcountry='.$to_options_chosen.'&destpostcode='.$to_postal_chosen.'&weight='.$weight_chosen.'&weightunit='.$weight_options_chosen.'&shipmenttype='.$shipment_options_chosen.'&token='.$token_value;
+   }
+   elseif($from_options_chosen == 'AE') {
+$token_value= '48-45-3F-1F-BD-E3-D9-30-AA-4F-E5-ED-9A-E6-5C-DE';
+$url ='https://ebookinguae.dtdc.com/quickquote.aspx?fromcountry='.$from_options_chosen.'&frompostcode='.$from_postal_chosen.'&destcountry='.$to_options_chosen.'&destpostcode='.$to_postal_chosen.'&weight='.$weight_chosen.'&weightunit='.$weight_options_chosen.'&shipmenttype='.$shipment_options_chosen.'&token='.$token_value;
+   }
+   elseif($from_options_chosen == 'GB'){
+$token_value= '4E-A5-E8-78-40-EC-C6-D1-BA-CA-FB-F5-3E-33-02-6D';
+$url ='https://ebookinguk.dtdc.com/quickquote.aspx?fromcountry='.$from_options_chosen.'&frompostcode='.$from_postal_chosen.'&destcountry='.$to_options_chosen.'&destpostcode='.$to_postal_chosen.'&weight='.$weight_chosen.'&weightunit='.$weight_options_chosen.'&shipmenttype='.$shipment_options_chosen.'&token='.$token_value;
+   }
+   elseif($from_options_chosen == 'CA') {
+$token_value= '1E-02-52-CB-98-AB-84-20-F7-19-F2-F1-C8-5B-DD-94';
+ $url ='https://ebookingca.dtdc.com/quickquote.aspx?fromcountry='.$from_options_chosen.'&frompostcode='.$from_postal_chosen.'&destcountry='.$to_options_chosen.'&destpostcode='.$to_postal_chosen.'&weight='.$weight_chosen.'&weightunit='.$weight_options_chosen.'&shipmenttype='.$shipment_options_chosen.'&token='.$token_value;
+   }
+   else{
+$token_value='68-0A-A0-62-5A-38-17-75-20-6A-9D-59-F2-C5-F1-B4';
+$url ='https://ebookingusa.dtdc.com/quickquote.aspx?fromcountry='.$from_options_chosen.'&frompostcode='.$from_postal_chosen.'&destcountry='.$to_options_chosen.'&destpostcode='.$to_postal_chosen.'&weight='.$weight_chosen.'&weightunit='.$weight_options_chosen.'&shipmenttype='.$shipment_options_chosen.'&token='.$token_value;
+   }
+    //$url ='http://ws88.ffdx.net/customer_v4/quickquote.aspx?fromcountry='.$from_options_chosen.'&frompostcode='.$from_postal_chosen.'&destcountry='.$to_options_chosen.'&destpostcode='.$to_postal_chosen.'&weight='.$weight_chosen.'&weightunit='.$weight_options_chosen.'&shipmenttype='.$shipment_options_chosen.'&token='.$token_value;
+   // echo $url;
+   // exit;
+    //header("Location: $url");
+   $form_state['redirect'] = $url;
+
+// drupal_goto("http://ws88.ffdx.net/customer_v4/quickquote.aspx", array("html" => true, "query" => "fromcountry=$from_options_chosen&frompostcode=$from_postal_chosen"));
+}
+// Custom tabs Block
+
+function custom_service_tabs_block_content(){
+  $output = array();
+  $output = "";
+  $result = db_select('node','n')
+      ->fields('n')
+      ->condition('status',1,'=')
+      ->condition('type','product_services','=')
+      ->orderBy('created', 'DESC')
+      ->execute();
+      foreach ($result as $term) {
+      $uri = $_SERVER['REQUEST_URI'];
+  		$array = explode('/',$uri);
+      $nid = $term->nid;
+      $node_details = node_load($nid);
+      $title = $node_details->title;
+      $id =  "product_".strtolower(str_replace(' ', '', ($title)));
+      $content = $node_details->body['und'][0]['value'];
+      $img_id = $node_details->field_product_image['und'][0]['fid'];
+      $file = file_load($img_id);
+      $uri = $file->uri;
+      $url = file_create_url($uri);
+      $current_path = drupal_get_path_alias($_GET["q"]);
+      if($array['1'] == $current_path && $id == 'product_e-commerce'){
+     $output .='<div role="tabpanel" class="tab-pane active" id="'.$id.'">';
+      }
+      else{
+       $output .='<div role="tabpanel" class="tab-pane" id="'.$id.'">';
+      }
+
+     $output .='<div class="media"><div class="media-left"><img class="media-object img-responsive" src="'.$url.'" /><div class="clear"></div></div><div class="media-body"><h3 class="media-heading">'.$title.'</h3><div class="dt-line1"></div>'.$content.'<div class="clear"></div></div><div class="clear"></div></div><div class="clear"></div></div>';
+     }
+
+  return $output;
+
+}
+
+
+function custom_careers_tabs_block_content(){
+  $output = array();
+  $output = "";
+  $result = db_select('node','n')
+      ->fields('n')
+      ->condition('status',1,'=')
+      ->condition('type','careers','=')
+      ->orderBy('created', 'DESC')
+      ->execute();
+
+      foreach ($result as $term) {
+      $uri = $_SERVER['REQUEST_URI'];
+  		$array = explode('/',$uri);
+      $nid = $term->nid;
+      $node_details = node_load($nid);
+      $title = $node_details->title;
+      $id = strtolower(str_replace(' ', '', ($title)));
+      $content = $node_details->body['und'][0]['value'];
+      $img_id = $node_details->field_image['und'][0]['fid'];
+      $file = file_load($img_id);
+      $uri = $file->uri;
+      $url = file_create_url($uri);
+      if($array['1'] == 'careers' && $id == 'currentopening'){
+     $output .='<div role="tabpanel" class="tab-pane active" id="'.$id.'">';
+      }
+      else if ($id == 'opportunities') {
+         $output .='<div role="tabpanel" class="tab-pane" id="'.$id.'">';
+      }
+      else{
+       $output .='<div role="tabpanel" class="tab-pane" id="'.$id.'">';
+      }
+
+     $output .='<div class="media"><div class="media-left"><img class="media-object img-responsive" src="'.$url.'" /><div class="clear"></div></div><div class="media-body"><h3 class="media-heading">'.$title.'</h3><div class="dt-line1"></div>'.$content.'<div class="clear"></div></div><div class="clear"></div></div><div class="clear"></div></div>';
+     }
+
+  return $output;
+
+}
+
+// Custom tabs Block
+
+function custom_service_prohi_block_content(){
+  $output = array();
+  $output = "";
+  $result = db_select('node','n')
+      ->fields('n')
+      ->condition('status',1,'=')
+      ->condition('type','product_services','=')
+      ->orderBy('created', 'DESC')
+      ->execute();
+      foreach ($result as $term) {
+      $uri = $_SERVER['REQUEST_URI'];
+      $array = explode('/',$uri);
+      $nid = $term->nid;
+      $node_details = node_load($nid);
+      $title = $node_details->title;
+      
+      if($title =="NDPS-Prohibited-Drugs")
+        $id = "product_".$title;
+      else  
+      $id =  "product_".strtolower(str_replace(' ', '', ($title)));
+      $content = $node_details->body['und'][0]['value'];
+      $img_id = $node_details->field_product_image['und'][0]['fid'];
+      $title = str_replace('-',' ', ($title));
+
+      $file = file_load($img_id);
+      $uri = $file->uri;
+      $url = file_create_url($uri);
+      if($array['1'] == 'prohibited-restricted-goods' && $id == 'product_prohibited-goods'){
+     $output .='<div role="tabpanel" class="tab-pane active" id="'.$id.'">';
+      }
+      else{
+       $output .='<div role="tabpanel" class="tab-pane" id="'.$id.'">';
+      }
+      if(!empty($img_id)){
+     $output .='<div class="media"><div class="media-left"><img class="media-object img-responsive" src="'.$url.'" /><div class="clear"></div></div><div class="media-body"><h3 class="media-heading">'.$title.'</h3><div class="dt-line1"></div>'.$content.'<div class="clear"></div></div><div class="clear"></div></div><div class="clear"></div></div>';
+      }else{
+        $output .='<div class="media"><div class="media-body"><h3 class="media-heading">'.$title.'</h3><div class="dt-line1"></div>'.$content.'<div class="clear"></div></div><div class="clear"></div></div><div class="clear"></div></div>';
+      }
+     }
+
+  return $output;
+
+}
+
+
+
+function custom_tabs_block_form_alter(&$form, &$form_state, $form_id) {
+ // print_r($form);
+  if ($form_id = 'search_block_form') {
+   $form['#attributes']['class'][] = 'navbar-form navbar-left';
+  }
+//   if($form_id = 'usa_tracking_form_ _2') {
+// echo "hi";
+//   }
+}
+?>

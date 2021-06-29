@@ -1,0 +1,350 @@
+<?php
+global $base_url;
+
+/**
+* Implements hook_block_info().
+*/
+
+function custom_tabs_block_mail_alter(&$message) {
+	$message['headers']['Sender']  = $message['from'];
+}
+
+
+function custom_tabs_block_block_info() {
+  $blocks = array();
+
+  $blocks['custom_service_tabs_block'] = array(
+    'info' => t('custom service tab block'),
+  );
+  $blocks['custom_careers_tabs_block'] = array(
+    'info' => t('custom careers tab block'),
+  );
+
+  $blocks['custom_prohibited_block'] = array(
+    'info' => t('custom service tab block'),
+  );
+
+  $blocks['custom_slider_tabs_block'] = array(
+    'info' => t('custom slider tab block'),
+  );
+  $blocks['custom_menu_tabs_block'] = array(
+    'info' => t('custom menu tab block'),
+  );
+  return $blocks;
+}
+/**
+* Implements hook_block_view().
+*/
+function custom_tabs_block_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'custom_service_tabs_block':
+        $block['subject'] = '';
+        $block['content'] = custom_service_tabs_block_content();
+        break;
+    case 'custom_careers_tabs_block':
+        $block['subject'] = '';
+        $block['content'] = custom_careers_tabs_block_content();
+        break;
+
+    case 'custom_prohibited_block':
+        $block['subject'] = '';
+        $block['content'] = custom_service_prohi_block_content();
+        break;
+
+    case 'custom_slider_tabs_block':
+        $block['subject'] = '';
+        $block['content'] = custom_slider_tabs_block_content();
+        break;
+    case 'custom_menu_tabs_block':
+        $block['subject'] = '';
+        $block['content'] = custom_menu_tabs_block_content();
+        break;
+
+  }
+
+  return $block;
+}
+// Custom tabs Block
+
+function custom_service_tabs_block_content(){
+  $output = array();
+  $output = "";
+  $result = db_select('node','n')
+      ->fields('n')
+      ->condition('status',1,'=')
+      ->condition('type','product_services','=')
+      ->orderBy('created', 'ASC')
+      ->execute();
+      foreach ($result as $term) {
+      $uri = $_SERVER['REQUEST_URI'];
+  		$array = explode('/',$uri);
+      $nid = $term->nid;
+      $node_details = node_load($nid);
+      //print_r($node_details);
+      $title = $node_details->title;
+      $content = $node_details->body['und'][0]['value'];
+      $id = $node_details->field_sub_desc['und'][0]['value'];
+      $img_id = $node_details->field_product_image['und'][0]['fid'];
+      $file = file_load($img_id);
+      $uri = $file->uri;
+      $url = file_create_url($uri);
+      if($array['1'] == 'product-services' && $id == 'crossborder'){
+     $output .='<div class="dt-tab-content tab-pane fade in active" id="'.$id.'"><div role="tabpanel" class="container">'.$content.'<div class="content2"><div class="col-md-6 col-sm-6 col-xs-12"><h3 class="services-email-title"><span class="'.$nid.'">Know more about </span> '.$title.'</h3></div></div></div></div>';
+      }
+      else{
+       $output .='<div role="tabpanel" class="container-fluid tab-pane fade" id="'.$id.'"><div class="container"><div class="col-lg-12 marg_auto">'.$content.'<div class="dt-marg1 content2"><div class="col-md-6 col-sm-6 col-xs-12"><h3 class="services-email-title"><span class="'.$nid.'">Know more about</span>'.$title.'</h3></div></div></div></div></div>';
+      }
+
+     }
+
+  return $output;
+
+}
+
+
+function custom_careers_tabs_block_content(){
+
+  $output = array();
+  $output = "";
+  $result = db_select('node','n')
+      ->fields('n')
+      ->condition('status',1,'=')
+      ->condition('type','careers','=')
+      ->orderBy('created', 'DESC')
+      ->execute();
+
+      foreach ($result as $term) {
+      $uri = $_SERVER['REQUEST_URI'];
+  		$array = explode('/',$uri);
+      $nid = $term->nid;
+      $node_details = node_load($nid);
+      $title = $node_details->title;
+      $id = strtolower(str_replace(' ', '', ($title)));
+      $content = $node_details->body['und'][0]['value'];
+      $img_id = $node_details->field_image['und'][0]['fid'];
+      $file = file_load($img_id);
+      $uri = $file->uri;
+      $url = file_create_url($uri);
+      if($title == 'Current Opening'){
+        $output .='<div class="marg5"><div class="col-lg-3 col-md-3 col-xs-12">';
+          $output .='<img class="media-object img-responsive" src="'.$url.'" alt="E-Commerce"><div class="clear"></div>  </div>';
+          $output .='<div class="col-lg-8 col-md-8 col-xs-12"><h3 class="media-heading">'.$title.'</h3>  <div class="dt-line1"></div>'.$content.'<div class="clear"></div></div><div class="clear"></div></div>';
+      }
+      if($title == 'Opportunities'){
+        $output .='<div class="marg5"><div class="col-lg-3 col-md-3 col-xs-12">';
+          $output .='<img class="media-object img-responsive" src="'.$url.'" alt="E-Commerce"><div class="clear"></div>  </div>';
+          $output .='<div class="col-lg-8 col-md-8 col-xs-12"><h3 class="media-heading">'.$title.'</h3>  <div class="dt-line1"></div>'.$content.'<div class="clear"></div></div><div class="clear"></div></div>';
+      } else {
+        $output .='<div id="workculture"><div class="col-lg-8 col-md-8 col-xs-12"><h3 class="media-heading">'.$title.'</h3>';
+        $output .='<div class="dt-line1"></div>'.$content.'<div class="clear"></div></div>';
+        $output .='<div class="col-lg-3 col-md-3 col-xs-12"> <img class="media-object" src="'.$url.'" alt="E-Commerce"><div class="clear"></div>';
+        $output .='</div><div class="clear"></div></div>';
+      }
+
+     }
+
+  return $output;
+
+}
+function custom_menu_tabs_block_content(){
+    global $base_url;
+   $menus = menu_tree_all_data('main-menu');
+
+     $i = 1;
+   $output = "";
+  $output .='<ul class="menu nav navbar-nav">';
+   foreach($menus as $row){
+     $uri = $_SERVER['REQUEST_URI'];
+     $array = explode('/',$uri);
+     if(strtolower($array[1]) == strtolower($row['link']['title'])){
+       $active = 'active1';
+     }elseif(strtolower($array[1]) == 'about-us' && strtolower($row['link']['title'] == 'About Us')){
+       $active = 'active1';
+     }elseif(strtolower($array[1]) == 'product-services' && $row['link']['title'] == 'Services'){
+       $active = 'active1';
+     }else{
+       $active = '';
+     }
+       if($row['link']['hidden']== 0){
+         $link_path = $row['link']['link_path'];
+
+         $alias_path = drupal_get_path_alias($link_path);
+          $elements = $row['below'];
+          if($elements){
+             if($row['link']['title'] == 'Services'){
+              $output .='<li class="serv_menu sub-menu-parent"><a class="'.$active.'" href="/'.$alias_path.'">'.$row['link']['title'].'</a>';
+            } else {
+             $output .='<li class="sub-menu-parent"><a class="'.$active.'" href="/'.$alias_path.'">'.$row['link']['title'].'</a>';
+          }
+        }
+        else {
+
+          if($row['link']['title'] == 'Buy Rakhi'){
+            $output .='<li class="first dd-active buy-rakhi'.$active.'"><a target="_blank" href="https://www.ziyo.in/rakhi.html">'.$row['link']['title'].'</a></li>';
+          }
+
+          if($row['link']['title'] == 'Home'){
+            $output .='<li class="first dd-active '.$active.'"><a href="/"><img src="/sites/all/themes/dtdc/images/home_white_logo.png"></a></li>';
+          }
+
+          if($row['link']['title'] == 'E-Booking'){
+            $output .='<li class="first dd-active '.$active.'"><a class="colorbox-load" href="/ebooking/chose-country?width=500&height=350&iframe=true">'.$row['link']['title'].'</a></li>';
+          }
+          if($row['link']['title'] == 'Blog'){
+            $output .='<li class="first dd-active '.$active.'"><a target="_blank" href="http://blog.dtdc.com/">'.$row['link']['title'].'</a></li>';
+          }
+          if($row['link']['title'] == 'KYC'){
+            $output .='<li class="first dd-active '.$active.'"><a target="_blank" href="http://www.dtdc.in/kyc/index.html?country=global">'.$row['link']['title'].'</a></li>';
+          }
+
+          if($row['link']['title'] == 'Contact Us'){
+            $output .='<li class="first dd-active '.$active.'"><a class="colorbox-load" href="/locate-us?width=500&height=300&iframe=true">'.$row['link']['title'].'</a></li>';
+          }          
+          else {
+            $output .='<li class="first dd-active '.$active.'"><a href="/'.$alias_path.'">'.$row['link']['title'].'</a>';
+        }
+      }
+          if($row['link']['title'] == 'Services'){
+               $output .= '<ul id="service_menu" class="sub-menu">';
+          } else {
+
+           $output .= '<ul class="sub-menu">';
+         }
+           $j = 1;
+           foreach ($elements as $value) {
+             if($value['link']['hidden']==0){
+             $menu_item = menu_get_item($value['link']['mlid']);
+             $link_path = $value['link']['link_path'];
+             $alias_path = drupal_get_path_alias($link_path);
+             $sub_uri = $_SERVER['REQUEST_URI'];
+             $sub_array = explode('/',$sub_uri);
+             //print_r($value['link']['title']);
+             if($value['link']['title'] == 'Overview'){
+               $output .= '<li><a href="/about-us#overview">'.$value['link']['title'].'</a></li>';
+             } elseif($value['link']['title'] == 'Core Management'){
+               $output .= '<li><a href="/about-us#management">'.$value['link']['title'].'</a></li>';
+             }elseif($value['link']['title'] == 'CSR'){
+               $output .= '<li><a href="/about-us#csr">'.$value['link']['title'].'</a></li>';
+             } elseif($value['link']['title'] == 'Cross Border Management'){
+                $output .= '<li><a href="product-services#crossborder">'.$value['link']['title'].'</a></li>';
+             }elseif($value['link']['title'] == 'Integrated Technology Platform'){
+                $output .= '<li><a href="product-services#integrated">'.$value['link']['title'].'</a></li>';
+             }elseif($value['link']['title'] == 'Multi-Vendor Management'){
+                $output .= '<li><a href="product-services#multivendor">'.$value['link']['title'].'</a></li>';
+             }elseif($value['link']['title'] == 'Warehousing & E-Fulfilment'){
+                $output .= '<li><a href="product-services#warehousing">'.$value['link']['title'].'</a></li>';
+             }elseif($value['link']['title'] == 'Last Mile Delivery'){
+                $output .= '<li><a href="product-services#lastmile">'.$value['link']['title'].'</a></li>';
+             }
+             elseif($value['link']['title'] == 'Current Opening'){
+                $output .= '<li><a href="careers#currentopening">'.$value['link']['title'].'</a></li>';
+             }elseif($value['link']['title'] == 'Opportunities'){
+                $output .= '<li><a href="careers#opportunities">'.$value['link']['title'].'</a></li>';
+             }elseif($value['link']['title'] == 'Work Culture'){
+                $output .= '<li><a href="careers#workculture">'.$value['link']['title'].'</a></li>';
+             }else {
+             $output .= '<li><a href="/'.$final_path.'">'.$value['link']['title'].'</a></li>';
+              }
+            }
+              $j++;
+           }
+             $output .='</ul>';
+             $output .='</li>';
+       }
+
+   }
+    $output .='</ul>';
+   return $output;
+}
+
+function custom_slider_tabs_block_content() {
+  $output = array();
+  $result = db_select('node','n')
+      ->fields('n')
+      ->condition('status',1,'=')
+      ->condition('type','slider','=')
+      ->orderBy('created', 'ASC')
+      ->execute();
+      foreach ($result as $key => $term) {
+        $nid = $term->nid;
+        $node_details = node_load($nid);
+        //$id =  $node_details->field_id_name['und'][0]['value'];
+        $content = $node_details->body['und'][0]['value'];
+        $img_id = $node_details->field_slider_image['und'][0]['fid'];
+        $file = file_load($img_id);
+        $uri = $file->uri;
+        $url = file_create_url($uri);
+        $output[$key] = array("url"=>$url,"content"=>$content);
+     }
+
+       return theme('slider_template',array('output' => $output));
+}
+function custom_tabs_block_theme(){
+	return array(
+		'slider_template' => array(
+			'template' => drupal_get_path('modules', 'custom_tabs_block') . '/templates/home-slider',
+			'variables' => array('output' => NULL,'query_path' => NULL)
+		),
+  );
+}
+
+
+// Custom tabs Block
+
+function custom_service_prohi_block_content(){
+  $output = array();
+  $output = "";
+  $result = db_select('node','n')
+      ->fields('n')
+      ->condition('status',1,'=')
+      ->condition('type','product_services','=')
+      ->orderBy('created', 'DESC')
+      ->execute();
+      foreach ($result as $term) {
+      $uri = $_SERVER['REQUEST_URI'];
+      $array = explode('/',$uri);
+      $nid = $term->nid;
+      $node_details = node_load($nid);
+      $title = $node_details->title;
+      if($title =="NDPS-Prohibited-Drugs")
+        $id = "product_".$title;
+      else  
+      $id =  "product_".strtolower(str_replace(' ', '', ($title)));
+      $content = $node_details->body['und'][0]['value'];
+      $img_id = $node_details->field_product_image['und'][0]['fid'];
+
+      $title = str_replace('-',' ', ($title));
+      $file = file_load($img_id);
+      $uri = $file->uri;
+      $url = file_create_url($uri);
+      if($array['1'] == 'prohibited-restricted-goods' && $id == 'product_prohibited-goods'){
+     $output .='<div role="tabpanel" class="tab-pane active" id="'.$id.'">';
+      }
+      else{
+       $output .='<div role="tabpanel" class="tab-pane" id="'.$id.'">';
+      }
+      if(!empty($img_id)){
+     $output .='<div class="media"><div class="media-left"><img class="media-object img-responsive" src="'.$url.'" /><div class="clear"></div></div><div class="media-body"><h3 class="media-heading">'.$title.'</h3><div class="dt-line1"></div>'.$content.'<div class="clear"></div></div><div class="clear"></div></div><div class="clear"></div></div>';
+      }else{
+        $output .='<div class="media"><div class="media-body"><h3 class="media-heading">'.$title.'</h3><div class="dt-line1"></div>'.$content.'<div class="clear"></div></div><div class="clear"></div></div><div class="clear"></div></div>';
+      }
+     }
+
+  return $output;
+
+}
+
+function custom_tabs_block_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id = 'search_block_form') {
+   $form['#attributes']['class'][] = 'navbar-form navbar-left';
+  }
+  if($form_id ='block_menu_menu_footer-menu'){
+    $form['#attributes']['class'][] = 'dt-foot-menu';
+  }
+  if($form_id ='send_feedback_form'){
+    $form['#attributes']['class'][] = 'form-inline';
+  }
+
+}
+

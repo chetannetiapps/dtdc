@@ -1,0 +1,304 @@
+
+.track1 {
+  width: auto;
+  max-width: 33%;
+  margin: 0 auto;
+  position: absolute;
+  top: 168px;
+  z-index: 1000;
+  left: 34%;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.track2 {
+    width: auto;
+    max-width: 85%;
+    margin: 0 auto;
+    position: absolute;
+    top: 323px;
+    z-index: 10;
+    left: 8%;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.track2 .glyphicon {
+  top: -26px;
+  background: #fff;
+  position: absolute;
+  top: 37px;
+  left: 74px;
+  width: 21px;
+  padding: 0px 4px;
+}
+
+.track2 .help-block{
+  width: 280px;
+    font-size: 10px;
+    position: absolute;
+    top: 57px;
+    left: -50px;
+}
+
+
+.track1 .radio{
+  padding-bottom:5px;
+  padding-right:22px;
+  font-size: 16px;
+}
+.row .carousel-caption h1 {
+	font-size: 25px !important;
+	color: #FFF!important;
+}
+.row .carousel-caption p {
+	color: #FFF!important;
+}
+
+.track1 .btn {
+  background-color: #e08a1d;
+    color: #ffffff !important;
+    font-size: 12px !important;
+    padding: 0px 0px 0px 0px!important;
+    border: none!important;
+    text-align: center!important;
+    height: 33px!important;
+    line-height: 0px!important;
+    width: 83px!important;
+    border-radius: 4px;
+    border-color: #c2700c;
+}
+
+.header-yellow p {
+  font-weight: bold;
+  font-size: 16px;
+  padding-bottom: 7px;
+  text-transform: uppercase;
+}
+
+.header-yellow {
+  border-radius: 5px 5px 0 0;
+  background: url(../images/ebooking-new.png) #e08a1d;
+  background-repeat: no-repeat;
+  background-size: 24px;
+  background-position: 13px;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  padding: 10px 0px 1px 48px;
+}
+
+.tab-content.ebooking {
+    border: #fff solid 1px;
+    padding: 10px 0px 40px 10px;
+    border-top: none;
+    margin-bottom: 15px;
+    background-color: rgba(255, 255, 255, 0.72);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.quoteblock {
+    display: inline-block;
+    padding: 0px 20px 0px 20px;
+}
+.yellow-btn {
+
+}
+
+.tab-content .border-full {
+    border-radius: 5px;
+}
+.tab-content .form-control {
+    border-radius: 0;
+    outline: none;
+}
+
+.header-blue {
+  border-radius: 5px 5px 0 0;
+    color: #ffffff !important;
+    font-weight: bold;
+    font-size: 12px !important;
+    background: url(../images/track-new.png) #191c3f;
+    background-repeat: no-repeat;
+    background-size: 28px;
+    padding: 7px 0px 1px 41px;
+    background-position: 13px;
+}
+.tab-content.ebooking {
+    border: #fff solid 1px;
+    padding: 10px 0px 40px 10px;
+    border-top: none;
+    margin-bottom: 15px;
+    background-color: rgba(255, 255, 255, 0.72);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.track1 form{ border: #fff solid 1px;
+    padding: 11px 1px 17px 32px;
+    border-top: none;
+    margin-bottom: 15px;
+    background-color: rgba(255, 255, 255, 0.72);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+  }
+
+  .track1 #edit-trackid{
+    max-width: 277px !important;
+    background-image: none !important;
+    background: #fff !important;
+  }
+.track-pane-main .track-ano {
+      color: #ed2e36;
+}
+.track-ano:hover, .track-ano:focus {
+    color: inherit;
+    text-decoration: none;
+}
+
+  .header-blue p {
+    font-size: 19px;
+    color: #fff;
+    text-align: left;
+    text-transform: uppercase;
+    padding: 7px 4px 11px 12px;
+}
+
+.track2 form {
+  border: #fff solid 1px;
+    padding: 20px 30px 24px 33px;
+    border-top: none;
+    margin-bottom: 15px;
+    margin-top: 0px;
+    background-color: rgba(255, 255, 255, 0.72);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    width: 100%;
+    margin: auto;
+}
+.pd-right{
+  padding-right: 0;
+  padding-left: 0;
+  width: 15%;
+}
+
+.track2 .form-required{
+  display: none;
+}
+
+.track2 .btn{
+  color: #fff;
+background-color: #191c3f;
+border-color:#191c3f;
+font-size: 11px;
+padding: 9px 20px 9px 15px;
+margin-top: 24px;
+width: 100%;
+}
+
+.track2 .form-item-from-choose-country, .track2 .form-item-to-choose-country{
+  width: 100%;
+}
+
+#edit-ebooking-from-postal, #edit-ebooking-to-postal{
+  font-size: 13px;
+    padding: 5px;
+}
+
+.has-feedback {
+    position: relative;
+}
+.pd-left {
+    padding-left: 0;
+    width: 11%;
+}
+
+
+
+.track2 label{
+  font-size: 16px;
+}
+
+.form-item-ebooking-weight .form-control-feedback{
+    display: none !important;
+
+}
+
+.ebookingweight{
+  width: 7%;
+}
+
+.ebookingweightunit{
+  width: 7%;
+}
+
+.ebookingweightunit .form-control{
+  padding-left: 4px;
+}
+
+
+
+@media (max-width: 768px) {
+.track1 {
+	width: auto;
+	position: relative;
+	margin: 0 auto;
+	left: 0;
+	max-width: 100%;
+  top:0px;
+}
+.track1 textarea{
+	padding: 8px !important;
+	width: 93% !important;
+	border-right: 1px solid #bfbbbb !important;
+}
+.track1 .radio {
+    padding-bottom: 5px;
+    padding-right: 19px;
+    padding-top: 5px;
+    font-size: 12px;
+    width: 100%;
+    display: inline-block;
+    line-height: 22px;
+    float: left;
+    margin-bottom: 0px;
+}
+.track1 form {
+    padding: 5px 15px !important;
+}
+.track1 .form-submit {
+    margin-left: 0px !important;
+}
+.track2 {
+	width: auto;
+	max-width: 100%;
+	margin: 0 auto;
+	position: relative;
+	top: 0;
+	z-index: 0;
+	left: 0;
+}
+.track2 .pd-right{
+  width: 60%;
+  padding-right: 0px;
+}
+.track2 .pd-left{
+  width: 40%;
+    padding-bottom: 11px;
+}
+
+.track2 form{
+	  padding: 20px 10px 12px 20px;
+}
+
+.track2 .btn{
+  float: left;
+  margin-bottom: 40px;
+}
+
+.dt-banner h3{
+  font-size: 20px;
+}
+.avail-offer{
+  margin-top:0px !important;
+}
+}

@@ -1,0 +1,4 @@
+name = "UAE tracking"
+description = "It can be used fot UAE tracking functionalits"
+core = "7.x"
+package = "Custom"

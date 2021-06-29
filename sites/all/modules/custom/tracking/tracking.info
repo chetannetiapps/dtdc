@@ -1,0 +1,4 @@
+name = "tracking"
+description = "It can be used fot tracking functionalits"
+core = "7.x"
+package = "Custom"

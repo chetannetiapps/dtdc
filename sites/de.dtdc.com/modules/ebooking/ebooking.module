@@ -1,0 +1,217 @@
+<?php
+
+/* Implements hook_init() */
+function ebooking_init()
+{
+    global $base_url;
+    drupal_add_js($base_url.'/sites/all/modules/custom/ebooking/js/ebooking.js');
+}
+
+/**
+ * Implements hook_menu().
+ */
+function ebooking_menu()
+{
+    $items = array();
+
+    $items['ebooking/chose-country'] = array(
+        'title' => t(''),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('ebookings_form'),
+        'access callback' => true,
+
+    );
+
+    $items['locate-us'] = array(
+        'title' => t(''),
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('locate_us_form'),
+        'access callback' => true,
+
+    );
+
+    $items['feedback'] = array(
+        'title' => t(''),
+        'page callback' => 'drupal_get_form',
+		    'page arguments' => array('send_feedback_form'),
+        'access callback' => true,
+
+    );
+
+
+    return $items;
+}
+
+function ebookings_form(){
+
+  $form = array();
+
+  $form['ebooking_text'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div class="e-booking"><h1>E-Booking</h1><p>We will be at your door, when you wish. Use our e-booking service for your convenience.</p></div>',
+  );
+
+  $form['choose_country'] = array(
+    '#type' => 'select',
+    '#title' => t('Choose a Country'),
+    '#options' => array(0 => t('Select'),1 => t('Canada'),2 => t('India'),3 => t('Singapore'),4 => t('UAE'),5 => t('UK'),6 => t('USA')),
+  );
+$form['ebooking_image'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div class="ebooking-img-wrapper"><img src="/sites/all/themes/dtdc/images/logo.png"/></div>',
+  );
+
+
+   return $form;
+}
+
+
+function locate_us_form(){
+  $form = array();
+
+  $form['locate_us_text'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div class="locate-us-msg"><h1>Locate Us</h1><p>Please choose a Country to find the contact details.</p></div>',
+  );
+
+  $form['locate_us_country'] = array(
+    '#type' => 'select',
+    '#title' => t('Choose a Country'),
+    '#options' => array(0 => t('Select'),1 => t('Australia'),2 => t('Bangladesh'),3 => t('Canada'),4 => t('China'),5 => t('Hongkong'),6 => t('India'),7 => t('Kenya'),8 => t('Malaysia'),9 => t('Nepal'),10 =>t('Pakistan'),11 => t('Singapore'),12 => t('Sri Lanka'),13 => t('UAE'),14 => t('UK'),15 => t('USA')),
+  );
+
+  $form['locate_us_image'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div class="ebooking-img-wrapper"><img src="/sites/all/themes/dtdc/images/logo.png"/></div>',
+  );
+
+  return $form;
+
+}
+
+
+function send_feedback_form(){
+  $form = array();
+
+  $form['feedback_heading'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div><h1>Request a callback</h1><p>Please fill out the form below and we will call you back.
+    </div>',
+  );
+
+	$form['feedback_name'] = array(
+    '#type' => 'textfield',
+ //   '#title' => t('Name'),
+    '#attributes' => array(
+        'placeholder' => t('Name'),
+    ),
+	);
+	$form['feedback_email'] = array(
+    '#type' => 'textfield',
+  //  '#title' => t('Email'),
+    '#attributes' => array(
+        'placeholder' => t('Email'),
+    ),
+	);
+	$form['feedback_phone'] = array(
+    '#type' => 'textfield',
+  //  '#title' => t('Phone number'),
+    '#attributes' => array(
+        'placeholder' => t('Phone number'),
+    ),
+	);
+  $form['feedback_post_code'] = array(
+    '#type' => 'textfield',
+  //  '#title' => t('Pick Up Post Code'),
+     '#attributes' => array(
+        'placeholder' => t('Pick Up Post Code'),
+    ),
+	);
+	$form['feedback_location'] = array(
+    '#type' => 'textfield',
+    // '#title' => t('Delivery Location'),
+    '#attributes' => array(
+        'placeholder' => t('Delivery Location*'),
+    ),
+	  '#required' => TRUE,
+	);
+	$form['feedback_message'] = array(
+    '#type' => 'textarea',
+   // '#title' => t('Message'),
+    '#attributes' => array(
+        'placeholder' => t('Message*'),
+    ),
+    '#required' => TRUE,
+	);
+	$form['submit_button'] = array(
+    '#type' => 'submit',
+    '#submit' => array('custom_feedback_form_submit'),
+    '#value' => t('Submit'),
+    '#prefix' => '<div class="send-feedback-form__submit">',
+    '#suffix' => '</div>'
+	);
+
+  $form['feedback_privacy'] = array(
+  '#type' => 'markup',
+  '#markup' => '<div>
+    <p>Please go through our <a href="/privacy-policy" target="_blank">privacy policy</a> to understand how we use your personal data</p></div>',
+  );
+
+  return $form;
+}
+
+
+function send_feedback_form_validate($form, &$form_state){
+	$valid_email = $form_state['values']['feedback_email'];
+	if(!valid_email_address($valid_email)) {
+		form_set_error('feedback_email', 'Sorry. Your email address,' . $valid_email . ', is not valid. Please submit a valid E-mail address.');
+	}
+}
+
+
+function custom_feedback_form_submit($form, &$form_state){
+	drupal_set_message("Thanks for the Submission, we will contact you shortly");
+	  $email_content = get_mail_content($form_state);
+     $body_content= htmlspecialchars($email_content);
+	  $params = array(
+	  'headers' => array('Content-Type' => 'text/html'),
+	  'body' => $body_content
+
+	  );
+	  $key = 'feedback_email';
+		$from = $form_state['values']['feedback_email'];
+   // $to  = array('siva@netiapps.com', 'devaraj@netiapps.com');
+		//$to = "dtdc.uk123@gmail.com";
+    $to = array("css.germany@dtdc.com");
+   $to_str = implode(",", $to);
+
+	  $mail = drupal_mail('ebooking', $key, $to_str, language_default(), $params, $from);
+}
+
+function ebooking_mail($key, &$message, $params){
+	$language = $message['language'];
+	$headers = array(
+    'MIME-Version' => '1.0',
+    'Content-Type' => 'text/html; charset=UTF-8; format=flowed',
+    'Content-Transfer-Encoding' => '8Bit',
+    'X-Mailer' => 'Drupal'
+	);
+	  foreach ($headers as $key => $value) {
+		$message['headers'][$key] = $value;
+	  }
+	  $message['subject'] = t('DTDC UK – CALLBACK');
+	  $message['body'][] = $params['body'];
+}
+
+function get_mail_content($form_state) {
+  $body = '';
+  $body .= '<b>Name</b>:  '.$form_state['values']['feedback_name'].'<br>';
+  $body .= '<b>Email Address</b>: '.$form_state['values']['feedback_email'].'<br>';
+  $body .= '<b>Phone Number</b>: '.$form_state['values']['feedback_phone'].'<br>';
+  $body .= '<b>Pick Up Post Code</b>: '.$form_state['values']['feedback_post_code'].'<br>';
+  $body .= '<b>Delivery Location</b>: '.$form_state['values']['feedback_location'].'<br>';
+  $body .= '<b>Message</b>: '.$form_state['values']['feedback_message'] . '<br>';
+
+
+  return $body;
+}

@@ -1,0 +1,4 @@
+name = "Custom Tabs Block"
+description = "Creating custom Tabs block with own template"
+core = "7.x"
+package = "custom"

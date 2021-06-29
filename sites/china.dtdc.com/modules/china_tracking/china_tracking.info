@@ -1,0 +1,4 @@
+name = "China tracking"
+description = "It can be used fot China tracking functionalits"
+core = "7.x"
+package = "Custom"

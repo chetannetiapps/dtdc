@@ -1,0 +1,407 @@
+<?php
+
+/**
+ * implements hook_menu
+ **/
+ 
+function singapore_tracking_menu() {
+
+  $items['tracking'] = array(
+    'title' => 'DTDC Singapore Tracking',
+    //'page arguments' => array(1),
+    'page callback' => 'dtdc_singapore_tracking',
+    'access callback' => TRUE,
+  );
+
+  return $items;
+}
+
+/**
+ * implements hook_block_info()
+ **/
+
+function singapore_tracking_block_info() {
+	$blocks = array();
+	$blocks['singapore_tracking_block'] = array(
+		'info' => t('Singapore Tracking Block'),
+	);
+	return $blocks;
+}
+
+/**
+ * implements hook_block_view()
+ **/
+
+function singapore_tracking_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+     case 'singapore_tracking_block':
+      $block['subject'] = '';
+      $block['content'] = drupal_get_form('singapore_tracking_form');
+    break;
+  }
+
+  return $block;
+}
+
+function singapore_tracking_form($form, &$form_state){
+
+	$form = array();
+	$active = array(0 => t('Shipment Number'), 1 => t('Reference Number'));
+	$form['track']['consigments'] = array(
+		 '#type' => 'radios',
+		 '#title' => t(''),
+		 '#default_value' => 0,
+		 '#options' => $active,
+		 '#description' => t(''),
+		 '#prefix' => '<div class="radio">',
+		 '#suffix' => '</div>',
+	  );
+     $form['track']['trackid'] = array(
+		  '#type' => 'textarea',
+		  '#title' => t(''),
+		  '#default_value' =>'',
+		  '#required' => TRUE,
+		  '#attributes' => array('placeholder' => 'Upto 25 AWB, separated by comma'),
+		  '#resizable' => false,
+		  '#prefix' => '<div class="form-group">',
+		  '#suffix' => '</div>',
+     );
+	$form['track']['submit'] = array(
+		'#type' => 'submit',
+		'#value' => 'Search',
+	);
+	return $form;
+}
+
+function singapore_tracking_form_submit(&$form, $form_state){
+	$trackingType = $form_state['values']['consigments'];
+	$tracking_no = $form_state['values']['trackid'];
+    $_SESSION['data']=$tracking_no;
+	if(strlen($form_state['values']['consigments']) == 0){
+		drupal_set_error("Please enter Shipment Number.");
+	}
+	//$form_state['redirect'] = 'tracking/'.$tracking_no;
+	drupal_goto('tracking');
+}
+
+/**
+ * Implements hook_menu page call back
+ **/
+
+//function dtdc_singapore_tracking($trackingNos) {
+function dtdc_singapore_tracking() {
+    $trackingNos =$_SESSION['data'];
+	$trackResult = array();
+    $trackingNos = trim(urldecode($trackingNos));
+    $trackingNos = (string)$trackingNos;
+    if(strpos($trackingNos, ",")) {
+		$tracklist = explode(",",$trackingNos);
+		foreach ($tracklist as $trackingNo) {
+			$output = trackingCURLRequest($trackingNo);
+			$trackResult[] = $output;
+
+		$trackLoc_output = trackingLocCURLRequest($trackingNos);
+        $track_Loc_Result = $trackLoc_output;
+
+			
+		}
+    }
+    else {
+		$tracklist[0] = $trackingNos;
+        $trackResult[0] = trackingCURLRequest($trackingNos);
+
+		$trackLoc_output = trackingLocCURLRequest($trackingNos);
+        $track_Loc_Result = $trackLoc_output;
+
+    }
+
+	//if only one event is there, add it to a numerical index, so the rest
+	//of the code work will work without any change.
+	if(is_string(array_keys($trackResult[0]['Event'])[0])){
+		$trackResult[0]['Event'] = array($trackResult[0]['Event']);
+	}
+
+	foreach($track_Loc_Result as $masterkey => $resultarray) {
+          if(!empty($resultarray)) {
+            
+            if(!empty($resultarray['Shipments'])){
+                foreach($resultarray['Shipments'] as $key => $shipment) {
+                 
+                  $ConsignorCountryName = $shipment['ConsignorCountryName'];
+                 
+                  $ConsigneeCountryName = $shipment['ConsigneeCountryName'];
+                }
+            }else{
+            foreach($resultarray[0]['Shipments'] as $key => $shipment) {
+                  
+                  $ConsignorCountryName = $shipment['ConsignorCountryName'];
+                  
+                   $ConsigneeCountryName = $shipment['ConsigneeCountryName'];
+                }
+            }  
+          }
+ 	} 
+
+    // echo "final <pre/>";print_r($trackResult);
+    $eventCache        = array();
+    $OriginEntityCache = array();
+    $UpdateEntityCache = array();
+
+    foreach($trackResult as $masterkey => $resultarray) {
+		if(!empty($resultarray)) {
+			foreach($resultarray['Event'] as $key => $event) {
+				$EventDateTime = $event['EventDateTime'];
+				list($date, $time, $type) = explode(" ", $EventDateTime);
+				$date = str_replace("/", "-", $date);
+				$dateObject = new DateTime($date);
+				$newDateTime = $dateObject->format('D, M, d, Y').' '.substr($time, 0, 5).' '.$type;
+				$trackResult[$masterkey]['Event'][$key]['FormatedEventDateTime'] = $newDateTime;
+
+				$EventID = $event['EventID'];
+				if(!isset($eventCache[$EventID])) {
+					$EventObject = singapore_tracking_node_load_by_title($EventID, 'tracking_event');
+					$trackResult[$masterkey]['Event'][$key]['EventName'] = $eventCache[$EventID] = $EventObject->field_evname['und'][0]['value'];
+				}
+				else {
+					$trackResult[$masterkey]['Event'][$key]['EventName'] = $eventCache[$EventID];
+				}
+				$OriginEntityID = $event['OriginEntityID'];
+				if(!isset($OriginEntityCache[$OriginEntityID])) {
+					$OriginEntityObject = singapore_tracking_node_load_by_title($OriginEntityID, 'tracking_entity');
+					$trackResult[$masterkey]['Event'][$key]['OriginEntity'] = $OriginEntityCache[$OriginEntityID] = $OriginEntityObject->field_ename['und'][0]['value'];
+				}
+				else {
+					$trackResult[$masterkey]['Event'][$key]['OriginEntity'] = $OriginEntityCache[$OriginEntityID];
+				}
+
+				$UpdateEntityCountry = $event['UpdateEntityCountry'];
+				if(!isset($UpdateEntityCache[$UpdateEntityCountry])) {
+					$UpdateEntityCountryObject = singapore_tracking_node_load_by_title($UpdateEntityCountry, 'country');
+					$trackResult[$masterkey]['Event'][$key]['UpdateEntityCountryName'] = $UpdateEntityCache[$UpdateEntityCountry] = $UpdateEntityCountryObject->field_name['und'][0]['value'];
+				} 
+				else {
+					$trackResult[$masterkey]['Event'][$key]['UpdateEntityCountryName'] = $UpdateEntityCache[$UpdateEntityCountry];
+				}
+			}
+		}
+		else {
+			$trackResult[$masterkey]['tracking-no'] = $tracklist[$masterkey];
+		}
+    }
+    drupal_get_form('singapore_tracking_form');
+    $eventCount = 0;
+    $finalEvent = $trackResult['Event'][$eventCount - 1]['EventID'];
+	switch ($finalEvent) {
+		case 1:
+			$colorsString = "'#084594','#2171b5','#4292c6','#6baed6','#9ecae1','#c6dbef','#eff3ff'";
+		break;
+		case 15:
+			$colorsString = "'#084594','#2171b5','#4292c6','#6baed6','#9ecae1','#c6dbef','#7F8D9E'";
+		break;
+		case 4:
+			$colorsString = "'#084594','#2171b5','#4292c6','#6baed6','#9ecae1','#7F8D9E','#7F8D9E'";
+		break;
+		case (3 OR 48):
+			$colorsString = "'#084594','#2171b5','#4292c6','#6baed6','#7F8D9E','#7F8D9E','#7F8D9E'";
+		break;
+		case 91:
+			$colorsString = "'#084594','#2171b5','#7F8D9E','#7F8D9E','#7F8D9E','#7F8D9E','#7F8D9E'";
+		break;
+		case 90:
+			$colorsString = "'#084594','#7F8D9E','#7F8D9E','#7F8D9E','#7F8D9E','#7F8D9E','#7F8D9E'";
+		break;
+		default:
+			$colorsString = "'#7F8D9E','#7F8D9E','#7F8D9E','#7F8D9E','#7F8D9E','#7F8D9E','#7F8D9E'";
+		break;
+    }
+   	return theme('tracking_ref',array('trackRecords'=>$trackResult,'eventCount'=>$eventCount,'colorsString'=>$colorsString,'finalEvent'=>$finalEvent,'Consignorcountryname'=> $ConsignorCountryName,'Consigneecountryname'=>$ConsigneeCountryName));
+}
+
+function singapore_tracking_theme($existing, $type, $theme, $path) {
+	return array(
+		'tracking_ref' => array(
+			'template' => 'page--singaporedtdctracking',
+			'path' => (drupal_get_path('theme', 'singapore_dtdc') . '/templates/'),
+			'variables' => array('trackRecords' => array(),'eventCount' => 0,'finalEvent' => 90),
+		),
+	);
+}
+
+
+/* function to get the consignor and consignee country names */
+function trackingLocCURLRequest($referenceNumber) {
+    $fields_string = '';
+    $fields = array(
+    'Username' => '36E85218F0520B3709AE8054A2D8B55D',
+    'Password' => '88A460BD2DD669B03E59B4740478D495',
+    
+    'xmlStream' => '<?xml version="1.0" encoding="UTF-8"?>
+                    <WSGET><AccessRequest>
+                    <WSVersion>WS1.0</WSVersion>
+                    <FileType>1</FileType>
+                    <Action>Download</Action>
+                    <EntityID>WS_DTDCGlOBAL</EntityID>
+                    <EntityPIN>eu29dm3i</EntityPIN>
+                    <MessageID>1</MessageID>
+                    <AccessID>DTDC_ID</AccessID>
+                    <AccessPIN>xls5vyh</AccessPIN>
+                    <CreatedDateTime></CreatedDateTime>
+                    <ManifestShipment>1</ManifestShipment>
+                    <ReferenceNumber>'.$referenceNumber.'</ReferenceNumber>
+                    </AccessRequest></WSGET>',
+
+    'LevelConfirm' => 'summary'
+    );
+     //url-ify the data for the POST
+    foreach($fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }
+    rtrim($fields_string,'&');
+    //open connection
+    $ch = curl_init();
+    //set the url, number of POST vars, POST data
+    $url = "https://ws05.ffdx.net/ffdx_ws/v12/service_ffdx.asmx/WSDataTransfer";
+    curl_setopt($ch,CURLOPT_URL,$url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+    curl_setopt($ch,CURLOPT_POST,count($fields)); // 18
+    curl_setopt($ch,CURLOPT_POSTFIELDS,$fields_string);
+
+    // Send to remote and return data to caller.
+    $result = curl_exec($ch);
+ 
+    $xml=simplexml_load_string($result) or die("Error: Cannot create object");
+
+    $data_array = xmlstr_to_array($xml);
+    curl_close($ch);
+    return $data_array;
+}
+
+function trackingCURLRequest($referenceNumber) {
+    $fields_string = '';
+    $fields = array(
+    'Username' => '36E85218F0520B3709AE8054A2D8B55D',
+    'Password' => '88A460BD2DD669B03E59B4740478D495',
+
+    'xmlStream' => '<?xml version="1.0" encoding="UTF-8"?>
+                    <WSGET>
+                        <AccessRequest>
+                            <WSVersion>WS1.0</WSVersion>
+                            <FileType>2</FileType>
+                            <Action>Download</Action>
+                            <EntityID>A75CB7AD4B230B5EFD1EACEBFCFD94F6</EntityID>
+                            <EntityPIN>si3dl3x</EntityPIN>
+                            <MessageID>0001</MessageID>
+                        </AccessRequest>
+                        <ReferenceNumber>'.$referenceNumber.'</ReferenceNumber>
+                        <ShowExtra>Y</ShowExtra>
+                    </WSGET>',
+        'LevelConfirm' => 'summary'
+    );
+
+	//url-ify the data for the POST
+    foreach($fields as $key => $value) { 
+		$fields_string .= $key.'='.$value.'&'; 
+	}
+    rtrim($fields_string,'&');
+
+    //open connection
+    $ch = curl_init();
+
+    //set the url, number of POST vars, POST data
+    $url = "https://ws05.ffdx.net/ffdx_ws/v12/service_ffdx.asmx/WSDataTransfer";
+    curl_setopt($ch,CURLOPT_URL,$url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch,CURLOPT_POST,count($fields));
+    curl_setopt($ch,CURLOPT_POSTFIELDS,$fields_string);
+
+    // Send to remote and return data to caller.
+    $result = curl_exec($ch);
+    $xml=simplexml_load_string($result) or die("Error: Cannot create object");
+    $data_array = xmlstr_to_array($xml);
+    curl_close($ch);
+    
+    return $data_array;
+}
+
+function xmlstr_to_array($xmlstr) {
+	$doc = new DOMDocument();
+	$doc->loadXML($xmlstr);
+	return domnode_to_array($doc->documentElement);
+}
+
+function domnode_to_array($node) {
+  $output = array();
+  switch ($node->nodeType) {
+   case XML_CDATA_SECTION_NODE:
+   case XML_TEXT_NODE:
+    $output = trim($node->textContent);
+   break;
+   case XML_ELEMENT_NODE:
+    for ($i=0, $m=$node->childNodes->length; $i<$m; $i++) {
+     $child = $node->childNodes->item($i);
+     $v = domnode_to_array($child);
+     if(isset($child->tagName)) {
+       $t = $child->tagName;
+       if(!isset($output[$t])) {
+        $output[$t] = array();
+       }
+       $output[$t][] = $v;
+     }
+     elseif($v) {
+      $output = (string) $v;
+     }
+    }
+    if(is_array($output)) {
+     if($node->attributes->length) {
+      $a = array();
+      foreach($node->attributes as $attrName => $attrNode) {
+       $a[$attrName] = (string) $attrNode->value;
+      }
+      $output['@attributes'] = $a;
+     }
+     foreach ($output as $t => $v) {
+      if(is_array($v) && count($v)==1 && $t!='@attributes') {
+       $output[$t] = $v[0];
+      }
+     }
+    }
+   break;
+  }
+  return $output;
+}
+
+/**
+ * Helper function; Load node by title
+*/
+function singapore_tracking_node_load_by_title($title, $node_type) {
+	if(is_string($title)) {
+		// Connect to Global DB to load the track specific content
+		$global_database = array(
+			'database' => 'dtdc',
+			'username' => 'root',
+			'password' => 'netiappsIndia123$$',
+			'host' => 'localhost',
+			'driver' => 'mysql',
+		);
+		// Add connection info & set unique key fro active DB
+		Database::addConnectionInfo('track_node_load', 'default', $global_database);
+		db_set_active('track_node_load');
+  
+		$query = new EntityFieldQuery();
+		$entities = $query->entityCondition('entity_type', 'node')
+			->propertyCondition('type', $node_type)
+			->propertyCondition('title', $title)
+			->propertyCondition('status', 0)
+			->execute();
+	}
+
+	// node load object
+	$node_object = is_array($entities['node']) ? node_load(array_shift(array_keys($entities['node']))) : NULL;
+	
+	// Set to default DB for the site
+	db_set_active();
+	
+	if(is_object($node_object)) {
+		return $node_object;
+	}
+}

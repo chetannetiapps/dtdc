@@ -1,0 +1,4 @@
+name = "Hongkong tracking"
+description = "It can be used for Hongkong tracking functionalits"
+core = "7.x"
+package = "Custom"

@@ -1,0 +1,4 @@
+name = E booking
+description = "E-booking pages based on country"
+core = "7.x"
+package = "Custom"

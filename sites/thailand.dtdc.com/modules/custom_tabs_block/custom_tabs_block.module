@@ -1,0 +1,220 @@
+<?php
+global $base_url;
+
+/**
+* Implements hook_block_info().
+*/
+function custom_tabs_block_block_info() {
+  $blocks = array();
+
+  $blocks['custom_service_tabs_block'] = array(
+    'info' => t('custom service tab block'),
+  );
+  $blocks['custom_careers_tabs_block'] = array(
+    'info' => t('custom careers tab block'),
+  );
+   $blocks['custom_service_th_tabs_block'] = array(
+    'info' => t('custom services th tab block'),
+  );
+  return $blocks;
+}
+/**
+* Implements hook_block_view().
+*/
+function custom_tabs_block_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'custom_service_tabs_block':
+        $block['subject'] = '';
+        $block['content'] = custom_service_tabs_block_content();
+        break;
+    case 'custom_service_th_tabs_block':
+        $block['subject'] = '';
+        $block['content'] = custom_service_th_tabs_block_content();
+        break;
+
+    case 'custom_careers_tabs_block':
+        $block['subject'] = '';
+        $block['content'] = custom_careers_tabs_block_content();
+        break;
+
+    case 'custom_careers_th_tabs_block':
+        $block['subject'] = '';
+        $block['content'] = custom_careers_th_tabs_block_content();
+        break;
+   // case 'custom_language_mobile_menu':
+   //  $block['subject'] = '';
+   //  $block['content'] = custom_language_mobile_menu();
+   //  break;
+
+  }
+
+  return $block;
+}
+
+// function custom_language_mobile_menu(){
+//   $result = db_select('languages', 'c')
+//         ->fields('c')
+//         ->condition('enabled', 1, '=')
+//         ->execute();
+//   $output = '<ul>';
+//   $path = current_path();
+//   while($row = $result->fetchObject()){
+//     $output .= '<li><a href="/'.$row->language.'/'.$path.'">'.$row->native.'</a></li>';   
+//   }
+//   $output .= '</ul>';
+//   return $output;
+// }
+
+
+// Custom tabs Block
+
+function custom_service_tabs_block_content() {
+  $output = array();
+  $output = "";
+    $result = db_select('node','n');
+  $result ->join('field_data_field_order','fu','fu.entity_id = n.nid');
+  $result = $result->fields('n')
+          ->condition('n.status',1,'=')
+           ->condition('n.language', 'en', '=')
+          ->condition('n.type','product_services','=')
+          ->orderBy('fu.field_order_value', 'ASC')
+          ->execute();
+    while($record_pay = $result->fetchObject()){
+    $nid= $record_pay->nid;
+    //print_r($nid);
+    //exit;
+    $node_details = node_load($nid);
+        $title = $node_details->title;
+        $id =  $node_details->field_id_name['und'][0]['value'];
+        $content = $node_details->body['und'][0]['value'];
+        $img_id = $node_details->field_product_image['und'][0]['fid'];
+        $file = file_load($img_id);
+        $uri = $file->uri;
+        $url = file_create_url($uri);
+        $output[] = array("id"=>$id,"url"=>$url,"title"=>$title,"content"=>$content);
+    }
+
+  return theme('services_tab_template',array('output' => $output));
+
+}
+
+function custom_service_th_tabs_block_content() {
+  $output = array();
+  $output = "";
+    $result = db_select('node','n');
+  $result ->join('field_data_field_order','fu','fu.entity_id = n.nid');
+  $result = $result->fields('n')
+          ->condition('n.status',1,'=')
+           ->condition('n.language', 'th', '=')
+          ->condition('n.type','product_services','=')
+          ->orderBy('fu.field_order_value', 'ASC')
+          ->execute();
+    while($record_pay = $result->fetchObject()){
+    $nid= $record_pay->nid;
+    //print_r($nid);
+    //exit;
+    $node_details = node_load($nid);
+        $title = $node_details->title;
+        $id =  $node_details->field_id_name['und'][0]['value'];
+        $content = $node_details->body['und'][0]['value'];
+        $img_id = $node_details->field_product_image['und'][0]['fid'];
+        $file = file_load($img_id);
+        $uri = $file->uri;
+        $url = file_create_url($uri);
+        $output[] = array("id"=>$id,"url"=>$url,"title"=>$title,"content"=>$content);
+    }
+
+  return theme('services_th_tab_template',array('output' => $output));
+
+}
+
+function custom_tabs_block_theme(){
+  return array(
+    'services_tab_template' => array(
+      'template' => drupal_get_path('modules', 'custom_tabs_block') . '/templates/services-tab',
+      'variables' => array('output' => NULL,'query_path' => NULL)
+    ),
+     'services_th_tab_template' => array(
+      'template' => drupal_get_path('modules', 'custom_tabs_block') . '/templates/services-th-tab',
+      'variables' => array('output' => NULL,'query_path' => NULL)
+    ),
+    'careers_tab_template' => array(
+      'template' => drupal_get_path('modules', 'custom_tabs_block') . '/templates/careers-tab',
+      'variables' => array('output' => NULL,'query_path' => NULL)
+    ),
+    'careers_th_tab_template' => array(
+      'template' => drupal_get_path('modules', 'custom_tabs_block') . '/templates/careers-th-tab',
+      'variables' => array('output' => NULL,'query_path' => NULL)
+    ),
+  );
+}
+
+
+
+function custom_careers_tabs_block_content() {
+  $output = array();
+  $output = "";
+  $result = db_select('node','n')
+      ->fields('n')
+      ->condition('status',1,'=')
+      ->condition('n.language', 'en', '=')
+      ->condition('type','careers','=')
+      ->orderBy('created', 'DESC')
+      ->execute();
+
+      foreach ($result as $term) {  
+      $uri = $_SERVER['REQUEST_URI'];
+      $array = explode('/',$uri);
+      $nid = $term->nid;
+      $node_details = node_load($nid);
+      $title = $node_details->title;
+      $id =  $node_details->field_id_name['und'][0]['value'];
+      $content = $node_details->body['und'][0]['value'];
+      $img_id = $node_details->field_image['und'][0]['fid'];
+      $file = file_load($img_id);
+      $uri = $file->uri;
+      $url = file_create_url($uri);
+      $output[] = array("id"=>$id,"url"=>$url,"title"=>$title,"content"=>$content);
+     }
+
+  return theme('careers_tab_template',array('output' => $output));
+
+}
+function custom_careers_th_tabs_block_content() {
+  $output = array();
+  $output = "";
+  $result = db_select('node','n')
+      ->fields('n')
+      ->condition('status',1,'=')
+      ->condition('n.language', 'th', '=')
+      ->condition('type','careers','=')
+      ->orderBy('created', 'DESC')
+      ->execute();
+
+      foreach ($result as $term) {  
+      $uri = $_SERVER['REQUEST_URI'];
+      $array = explode('/',$uri);
+      $nid = $term->nid;
+      $node_details = node_load($nid);
+      $title = $node_details->title;
+      $id =  $node_details->field_id_name['und'][0]['value'];
+      $content = $node_details->body['und'][0]['value'];
+      $img_id = $node_details->field_image['und'][0]['fid'];
+      $file = file_load($img_id);
+      $uri = $file->uri;
+      $url = file_create_url($uri);
+      $output[] = array("id"=>$id,"url"=>$url,"title"=>$title,"content"=>$content);
+     }
+
+  return theme('careers_th_tab_template',array('output' => $output));
+
+}
+
+
+function custom_tabs_block_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id = 'search-block-form') {
+   $form['#attributes']['class'][] = 'navbar-form navbar-left';
+  }
+}
+?>

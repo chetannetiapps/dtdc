@@ -1,0 +1,4 @@
+name = "Custom Alter"
+description = "It can be used fot custom functionalits"
+core = "7.x"
+package = "Custom"

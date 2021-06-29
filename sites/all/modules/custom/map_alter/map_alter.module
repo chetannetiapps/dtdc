@@ -1,0 +1,252 @@
+<?php
+
+function map_alter_init(){
+  //    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+   // <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+   //  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  //    drupal_add_js("https://maps.googleapis.com/maps/api/js?key=AIzaSyBfgN5f9cUmE7qT_7VgCCkdHwU__ht7Byc&v=3.exp&sensor=set_to_true_or_false");
+  // drupal_add_js(drupal_get_path('module', 'map_alter') . '/js/map_alter.js');
+  // drupal_add_js(drupal_get_path('module', 'map_alter') . '/js/markerclusterer.js');
+
+}
+
+
+function map_alter_menu(){
+
+$items = array();
+	$items['custom-contact-us-ajax'] = array(	      
+	    'title' => (''),
+	    'page callback' => '_custom_ajax_action',
+	    'access callback' => TRUE,
+	  );
+	$items['contact-us'] = array(
+      'page callback' => 'map_alter_action',
+      'page arguments' => array(),
+      'access arguments' => array('access content'), 
+      'access callback' => TRUE,
+    );
+  $items['contactus_listview_ajax'] = array(
+      'page callback' => 'contactus_listview_ajax_action',
+      'page arguments' => array(),
+      'access arguments' => array('access content'), 
+      'access callback' => TRUE,
+    );
+	return $items;
+  
+}
+
+
+
+function _custom_ajax_action(){
+  $country = trim($_POST['country']);
+  
+	$query = db_select('node', 'n');
+      $query->leftJoin('field_data_field_franchise_latitude', 'lt', 'lt.entity_id= n.nid');
+      $query->leftJoin('field_data_field_franchise_longitude', 'ln', 'ln.entity_id= n.nid');
+      $query->leftJoin('field_data_field_franchise_address', 'fradd1', 'fradd1.entity_id= n.nid');
+      $query->join('field_data_field_franchise_country', 'co', 'co.entity_id= n.nid');
+      $query->fields('n', array('title'));
+      $query->fields('lt', array('field_franchise_latitude_value'));
+      $query->fields('ln', array('field_franchise_longitude_value'));
+      $query->fields('fradd1',array('field_franchise_address_value'));
+      $query->condition('n.status',1, '=');
+
+      if($country!='_none' && $country!='')
+        $query->condition('co.field_franchise_country_value',$country, '=');
+      $query->orderby('n.created','DESC');
+      //$query->range(0,2);
+      $result = $query->execute()->fetchAll();
+
+      $output = array();
+      foreach($result as $key=>$value){
+        array_push($output, array('title'=>$value->title,'lat'=>$value->field_franchise_latitude_value,'lng'=>$value->field_franchise_longitude_value,'location'=>$value->field_franchise_address_value));
+      }
+
+	//print_r($result);
+   echo drupal_json_output($output);  
+}
+
+
+function contactus_listview_ajax_action(){
+  $requestcontent = json_encode($_POST);//file_get_contents('php://input');
+  $inputarr = json_decode($requestcontent);
+ // print_r($requestcontent);exit;
+    //$aColumns = array( 'n.title', 'add1.field_data_field_franchise_address','add2.field_data_field_franchise_address2', 'city.field_data_field_fr_city','country.field_data_field_franchise_country', 'email.field_data_field_fr_email', 'fax.field_data_field_franchise_fax','phone.field_data_field_franchise_phone','pincode.field_data_field_fr_map_pin');
+    $aColumns = array( 'n.title', 'cp.field_franchise_contact_person_value', 'CONCAT(add1.field_franchise_address_value,add2.field_franchise_address2_value) as address', 'city.field_fr_city_value','country.field_franchise_country_value', 'email.field_fr_email_value', 'fax.field_franchise_fax_value','phone.field_franchise_phone_value','pincode.field_pincode_value');
+
+    /* 
+     * Paging
+     */
+    $sLimit = "";
+    if ( isset( $inputarr->iDisplayStart ) && $inputarr->iDisplayLength!= '-1' )
+    {
+      $sLimit = "LIMIT ". $inputarr->iDisplayStart .", ".
+         $inputarr->iDisplayLength ;
+    }
+    
+    
+    /*
+     * Ordering
+     */
+    if ( isset( $inputarr->iSortCol_0 ) )
+    {
+      $sOrder = "ORDER BY  ";
+      for ( $i=0 ; $i<intval( $inputarr->iSortingCols ) ; $i++ )
+      {
+        $colsorti = 'iSortCol_'.$i;
+        $colsort = $inputarr->{$colsorti};
+        $sortDiri = 'sSortDir_'.$i;
+        $sortDir = $inputarr->{$sortDiri};
+        $temp = 'bSortable_'.intval($colsort);
+        if ( $inputarr->{$temp} == "true" )
+        {
+          $sOrder .= $aColumns[ intval($colsort) ]."
+            ".$sortDir .", ";
+        }
+      }
+      
+      $sOrder = substr_replace( $sOrder, "", -2 );
+      if ( $sOrder == "ORDER BY" )
+      {
+        $sOrder = "";
+      }
+    }
+    
+    
+    /* 
+     * Filtering
+     * NOTE this does not match the built-in DataTables filtering which does it
+     * word by word on any field. It's possible to do here, but concerned about efficiency
+     * on very large tables, and MySQL's regex functionality is very limited
+     */
+
+      $sWhere = "Where  n.status =1 and n.type = 'dtdc_country_branch'"; 
+   
+
+
+
+    if ( $inputarr->sSearch != "" )
+    {
+      $sWhere .= " and (";
+      for ( $i=0 ; $i<count($aColumns) ; $i++ )
+      {
+        $sWhere .= $aColumns[$i]." LIKE '%".$inputarr->sSearch."%' OR ";
+      }
+      $sWhere = substr_replace( $sWhere, "", -3 );
+      $sWhere .= ')';
+    }
+    
+    
+    // /* Individual column filtering */
+    // for ( $i=0 ; $i<count($aColumns) ; $i++ )
+    // {
+      
+    //   if (isset($inputarr->{'bSearchable_'.$i}) == "true" && isset($inputarr->{'sSearch_'.$i})!= '' )
+    //   {
+    //     if ( $sWhere == "" )
+    //     {
+    //       $sWhere = "WHERE ";
+    //     }
+    //     else
+    //     {
+    //       $sWhere .= " AND ";
+    //     }
+    //     $sWhere .= $aColumns[$i]." LIKE '".$inputarr->{'sSearch_'.$i}."%' ";
+    //   }
+    // }
+    
+    
+    /*
+     * SQL queries
+     * Get data to display
+     */
+    $sQuery = "
+      SELECT SQL_CALC_FOUND_ROWS ".str_replace(" , ", " ", implode(", ", $aColumns))."
+      FROM   node n 
+      left join field_data_field_franchise_contact_person cp on cp.entity_id = n.nid 
+      left join field_data_field_franchise_address add1 on add1.entity_id = n.nid 
+      left join field_data_field_franchise_address2 add2 on add2.entity_id = n.nid
+      left join field_data_field_fr_city city on city.entity_id = n.nid
+      left join field_data_field_franchise_country country on country.entity_id = n.nid
+      left join field_data_field_fr_email email on email.entity_id = n.nid
+      left join field_data_field_franchise_fax fax on fax.entity_id = n.nid
+      left join field_data_field_franchise_phone phone on phone.entity_id = n.nid
+      left join field_data_field_pincode pincode on pincode.entity_id = n.nid
+      $sWhere
+      $sLimit
+    ";
+     $stmt = db_query($sQuery);
+      
+    $rResult = $stmt->fetchAll();
+    
+    /* Data set length after filtering */
+    $sQuery = "
+      SELECT FOUND_ROWS()
+    ";
+    
+     $stmt =db_query($sQuery);
+      $aResultFilterTotal = $stmt->fetchColumn();
+    $iFilteredTotal = $aResultFilterTotal;
+    
+    /* Total data set length */
+    $sQuery = "
+      SELECT COUNT(n.nid)
+      FROM   node n 
+      left join field_data_field_franchise_contact_person cp on cp.entity_id = n.nid 
+      left join field_data_field_franchise_address add1 on add1.entity_id = n.nid 
+      left join field_data_field_franchise_address2 add2 on add2.entity_id = n.nid
+      left join field_data_field_fr_city city on city.entity_id = n.nid
+      left join field_data_field_franchise_country country on country.entity_id = n.nid
+      left join field_data_field_fr_email email on email.entity_id = n.nid
+      left join field_data_field_franchise_fax fax on fax.entity_id = n.nid
+      left join field_data_field_franchise_phone phone on phone.entity_id = n.nid
+      left join field_data_field_pincode pincode on pincode.entity_id = n.nid
+      $sWhere
+    ";
+
+
+  
+
+    $stmt =db_query($sQuery);
+      $aResultTotal = $stmt->fetchColumn();
+    $iTotal = $aResultTotal;
+    
+    
+    /*
+     * Output
+     */
+    $output = array(
+      "sEcho" => intval($inputarr->sEcho),
+      "iTotalRecords" => $iTotal,
+      "iTotalDisplayRecords" => $iFilteredTotal,
+      "aaData" => $rResult
+    );
+
+
+    
+    //print_r($result);
+   echo drupal_json_output($output);  
+
+}
+
+
+function map_alter_action() {
+  $query =  db_select('field_data_field_franchise_country', 'cn');
+            $query->distinct();
+           $query->fields('cn', array('field_franchise_country_value'));
+           $result = $query->execute()->fetchAll();
+
+  return theme('custom-contact-us',array('countries'=>$result));
+}
+
+function map_alter_theme($existing, $type, $theme, $path) {
+  $theme = array();
+  $theme['custom-contact-us'] = array(    
+    'template' => 'custom--map',
+    'path' => 'sites/all/themes/dtdc/templates',
+    'variables'=>array('countries'=>array()),
+   );
+  return $theme;
+}
+?>

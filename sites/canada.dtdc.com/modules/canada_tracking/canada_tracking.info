@@ -1,0 +1,4 @@
+name = "CANADA tracking"
+description = "It can be used fot CANADA tracking functionalits"
+core = "7.x"
+package = "Custom"

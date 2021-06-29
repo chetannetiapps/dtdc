@@ -1,0 +1,4 @@
+name = "Bangladesh tracking"
+description = "It can be used fot Bangladesh tracking functionalits"
+core = "7.x"
+package = "Custom"
