@@ -43,8 +43,11 @@
 			<p>Track your shipments either using DTDC AWB No. or corresponding reference number.  You can track upto 25 shipments together, separated by Comma(,);</p>
 		<?php }
 		else {
-      // echo '<iframe  class="iframe-class" src="http://track.dtdc.com/ctbs-tracking/customerInterface.tr?submitName=showCITrackingDetails&cnNo='.$trackRecord['tracking-no'].'&cType=Consignment" height="800"  id="dom-tracking"></iframe>';
+      if($TrackingTypevalue == 0 ){
       echo '<iframe  class="iframe-class" src="https://tracking.dtdc.com/ctbs-tracking/customerInterface.tr?submitName=showCITrackingDetails&cnNo='.$trackRecord['tracking-no'].'&cType=Consignment" height="800"  id="dom-tracking"></iframe>';
+      }else{
+       echo '<iframe  class="iframe-class" src="https://tracking.dtdc.com/ctbs-tracking/customerInterface.tr?submitName=showCITrackingDetails&cnNo='.$trackRecord['tracking-no'].'&cType=refNo" height="800"  id="dom-tracking"></iframe>'; 
+      }
 		}
     }
     else {
