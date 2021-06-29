@@ -79,6 +79,7 @@ function srilanka_tracking_form_submit(&$form, $form_state){
 	$trackingType = $form_state['values']['consigments'];
 	$tracking_no = $form_state['values']['trackid'];
      $_SESSION['data'] = $tracking_no;
+     $_SESSION['tracking_type']=$trackingType;
 	if(strlen($form_state['values']['consigments']) == 0){
 		drupal_set_error("Please enter Shipment Number.");
 	}
@@ -93,6 +94,7 @@ function srilanka_tracking_form_submit(&$form, $form_state){
 //function dtdc_srilanka_tracking($trackingNos) {
 function dtdc_srilanka_tracking() {
     $trackingNos = $_SESSION['data'];
+    $trackingType =$_SESSION['tracking_type'];
 	$trackResult = array();
     $trackingNos = trim(urldecode($trackingNos));
     $trackingNos = (string)$trackingNos;
@@ -213,7 +215,7 @@ function dtdc_srilanka_tracking() {
 			$colorsString = "'#7F8D9E','#7F8D9E','#7F8D9E','#7F8D9E','#7F8D9E','#7F8D9E','#7F8D9E'";
 		break;
     }
-   	return theme('tracking_ref',array('trackRecords'=>$trackResult,'eventCount'=>$eventCount,'colorsString'=>$colorsString,'finalEvent'=>$finalEvent,'Consignorcountryname'=> $ConsignorCountryName,'Consigneecountryname'=>$ConsigneeCountryName));
+   	return theme('tracking_ref',array('trackRecords'=>$trackResult,'eventCount'=>$eventCount,'colorsString'=>$colorsString,'finalEvent'=>$finalEvent,'Consignorcountryname'=> $ConsignorCountryName,'Consigneecountryname'=>$ConsigneeCountryName,'TrackingTypevalue'=>$trackingType));
 }
 
 function srilanka_tracking_theme($existing, $type, $theme, $path) {
