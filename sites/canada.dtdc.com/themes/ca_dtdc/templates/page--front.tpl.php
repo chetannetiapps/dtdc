@@ -229,7 +229,7 @@ jQuery(document).ready(function($){
 <!-- Product services block -->
 <div class="clear"></div>
 <!-- Delivery patner Block -->
-<div class="container-fluid dt-footer">
+<!-- <div class="container-fluid dt-footer">
   <div class="container">
   <div class="views-row views-row-1 views-row-odd views-row-first views-row-last">
           <div class="views-field views-field-title"> <span class="field-content">
@@ -240,8 +240,8 @@ jQuery(document).ready(function($){
           <div class="views-field views-field-field-delivery-image">
             <div class="field-content"> 
                 <img typeof="foaf:Image" src="/sites/canada.dtdc.com/themes/ca_dtdc/images/fedex.png" width="110" alt="">&nbsp;&nbsp;&nbsp;
-                <!--<img typeof="foaf:Image" src="images/eastern11.png" width="160" height="49" alt=""> 
-                <img typeof="foaf:Image" src="images/us-post11.png" width="89" height="60" alt="">-->
+                <img typeof="foaf:Image" src="images/eastern11.png" width="160" height="49" alt=""> 
+                <img typeof="foaf:Image" src="images/us-post11.png" width="89" height="60" alt="">
                 <img typeof="foaf:Image" src="/sites/canada.dtdc.com/themes/ca_dtdc/images/logo_dhl.png" width="140" alt="">
                 <img typeof="foaf:Image" src="/sites/canada.dtdc.com/themes/ca_dtdc/images/logo_purolator.png" width="180" alt="">
                 <img typeof="foaf:Image" src="/sites/canada.dtdc.com/themes/ca_dtdc/images/logo_canpar.png" width="100" alt="">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -250,10 +250,8 @@ jQuery(document).ready(function($){
             </div>
           </div>
         </div>
-    <?php // $block = module_invoke('views', 'block_view', 'delivery_partner-block');
-        // print render($block['content']); ?>
   </div>
-</div>
+</div> -->
 <!-- Delivery patner Block -->
 </div>
 <!-- footer block -->

@@ -208,7 +208,7 @@
 <!-- Special offer block -->
 
 <!-- Delivery partner block -->
-<div class="container-fluid dt-footer">
+<!-- <div class="container-fluid dt-footer">
   <div class="container">
    <div class="views-row views-row-1 views-row-odd views-row-first views-row-last">
           <div class="views-field views-field-title"> <span class="field-content">
@@ -219,25 +219,18 @@
           <div class="views-field views-field-field-delivery-image">
             <div class="field-content"> 
                 <img typeof="foaf:Image" src="/sites/usa.dtdc.com/themes/usa_dtdc/images/fedex.png" width="110" alt="">&nbsp;&nbsp;&nbsp;
-                <!--<img typeof="foaf:Image" src="images/eastern11.png" width="160" height="49" alt=""> 
-                <img typeof="foaf:Image" src="images/us-post11.png" width="89" height="60" alt="">-->
                 <img typeof="foaf:Image" src="/sites/usa.dtdc.com/themes/usa_dtdc/images/logo_dhl.png" width="130" alt="">&nbsp;&nbsp;&nbsp;
                 <img typeof="foaf:Image" src="/sites/usa.dtdc.com/themes/usa_dtdc/images/logo_UPS.png" height="60" alt="">&nbsp;&nbsp;&nbsp;
                 <img typeof="foaf:Image" src="/sites/usa.dtdc.com/themes/usa_dtdc/images/logo_IATA.png" width="89" alt="">&nbsp;&nbsp;&nbsp;
                 <img typeof="foaf:Image" src="/sites/usa.dtdc.com/themes/usa_dtdc/images/logo_deluxedeliveries.png" width="95" alt="">&nbsp;&nbsp;&nbsp;
                 <img typeof="foaf:Image" src="/sites/usa.dtdc.com/themes/usa_dtdc/images/logo_YRCfreight.png" width="80" alt="">
-                <!--<img typeof="foaf:Image" src="images/logo_lbc.png" width="130"  alt="">-->
-               
             </div>
           </div>
         </div>
-  
-		<?php //  $block = module_invoke('views', 'block_view', 'delivery_partner-block');
-				// print render($block['content']); ?>
   </div>
 </div>
 <div class="clear"></div>
-</div>
+</div> -->
 <!-- Delivery partner block -->
 
 <!-- footer block -->
