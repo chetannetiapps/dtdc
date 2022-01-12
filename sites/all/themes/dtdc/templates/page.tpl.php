@@ -121,8 +121,8 @@
 			                <li class="us"><a href="http://usa.dtdc.com/"><span>&nbsp;</span>United States</a></li>
 			              </ul>
 			            </div>
-                  <?php  $block = module_invoke('search', 'block_view', 'form');
-                   print render($block); ?>
+                  <?php  // $block = module_invoke('search', 'block_view', 'form');
+         //  print render($block); ?>
 			          </div>
                <?php /*
 							  * 	<!---menu block --------->
